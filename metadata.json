@@ -1,0 +1,6 @@
+{
+  "name": "FadeInbox",
+  "description": "A premium temporary email service with Spatial UI, Bento Grid architecture, live Mail.tm inbox, dark/light theme, i18n support, and Firebase sync.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,48 @@
+{
+  "entities": {
+    "users": {
+      "title": "User Profiles",
+      "description": "User account information and preferences",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["uid", "email"]
+    },
+    "history": {
+      "title": "Email History",
+      "description": "Generated temporary email addresses history for logged in users",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "address": { "type": "string" },
+        "token": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "expiresAt": { "type": "string" }
+      },
+      "required": ["userId", "address"]
+    },
+    "savedMessages": {
+      "title": "Saved Messages",
+      "description": "Permanently saved emails/messages from temporary inbox",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "emailAddress": { "type": "string" },
+        "messageId": { "type": "string" },
+        "fromAddress": { "type": "string" },
+        "fromName": { "type": "string" },
+        "subject": { "type": "string" },
+        "intro": { "type": "string" },
+        "text": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["userId", "messageId", "subject"]
+    }
+  }
+}
