@@ -71,9 +71,21 @@ export function generateRandomPassword(length = 12): string {
 export async function getAllDomains(): Promise<MailDomain[]> {
   const domains: MailDomain[] = [];
 
+  // Helper for CORS proxy fetch fallback
+  const corsFetch = async (url: string) => {
+    try {
+      const res = await fetch(url);
+      if (res.ok) return res;
+    } catch {
+      // ignore
+    }
+    // Fallback using allorigins proxy
+    return fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`);
+  };
+
   // Provider 1: mail.tm
   try {
-    const res = await fetch('https://api.mail.tm/domains');
+    const res = await corsFetch('https://api.mail.tm/domains');
     if (res.ok) {
       const data = await res.json();
       const members = data['hydra:member'] || data.member || data;
@@ -95,7 +107,7 @@ export async function getAllDomains(): Promise<MailDomain[]> {
 
   // Provider 2: mail.gw
   try {
-    const res = await fetch('https://api.mail.gw/domains');
+    const res = await corsFetch('https://api.mail.gw/domains');
     if (res.ok) {
       const data = await res.json();
       const members = data['hydra:member'] || data.member || data;
@@ -120,7 +132,7 @@ export async function getAllDomains(): Promise<MailDomain[]> {
 
   // Provider 3: 1secmail
   try {
-    const res = await fetch('https://www.1secmail.com/api/v1/?action=getDomainList');
+    const res = await corsFetch('https://www.1secmail.com/api/v1/?action=getDomainList');
     if (res.ok) {
       const list: string[] = await res.json();
       list.forEach((dom) => {
