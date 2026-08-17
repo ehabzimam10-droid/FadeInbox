@@ -21,8 +21,10 @@ const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
 
-// Initialize Firestore (pass custom databaseId if specified in applet config)
-const databaseId = firebaseConfigData.firestoreDatabaseId || undefined;
+// Initialize Firestore
+const databaseId = firebaseConfigData.firestoreDatabaseId && firebaseConfigData.firestoreDatabaseId !== '(default)' 
+  ? firebaseConfigData.firestoreDatabaseId 
+  : undefined;
 export const db = databaseId ? getFirestore(app, databaseId) : getFirestore(app);
 
 export default app;
