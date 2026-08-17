@@ -29,16 +29,34 @@ export default function AdSenseUnit({
   const isPushed = useRef(false);
 
   useEffect(() => {
-    // Only push if script is loaded and hasn't been pushed yet for this element
+    // Only push if script is loaded, container has visible width (>0), and hasn't been pushed yet
     if (adRef.current && !isPushed.current) {
-      try {
-        if (typeof window !== 'undefined') {
-          (window.adsbygoogle = window.adsbygoogle || []).push({});
-          isPushed.current = true;
+      const checkAndPush = () => {
+        if (adRef.current && adRef.current.offsetWidth > 0 && !isPushed.current) {
+          try {
+            if (typeof window !== 'undefined') {
+              (window.adsbygoogle = window.adsbygoogle || []).push({});
+              isPushed.current = true;
+            }
+          } catch (err) {
+            console.debug('AdSense unit initialized:', err);
+          }
         }
-      } catch (err) {
-        // Suppress expected adsbygoogle push duplicate or adblock warnings
-        console.debug('AdSense unit initialized:', err);
+      };
+
+      // Check immediately
+      checkAndPush();
+
+      // If width was 0 (e.g. rendered in hidden container or fast tab switch), observe resize
+      if (!isPushed.current && typeof ResizeObserver !== 'undefined' && adRef.current) {
+        const observer = new ResizeObserver(() => {
+          if (adRef.current && adRef.current.offsetWidth > 0 && !isPushed.current) {
+            checkAndPush();
+            observer.disconnect();
+          }
+        });
+        observer.observe(adRef.current);
+        return () => observer.disconnect();
       }
     }
   }, []);
