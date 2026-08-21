@@ -78,11 +78,19 @@ export default function App() {
 
   // Sync Theme attribute
   useEffect(() => {
+    const root = document.documentElement;
+    const body = document.body;
     if (isDark) {
-      document.documentElement.classList.add('dark');
+      root.classList.add('dark');
+      body.classList.add('dark');
+      root.setAttribute('data-theme', 'dark');
+      root.style.colorScheme = 'dark';
       localStorage.setItem('fadeinbox_theme', 'dark');
     } else {
-      document.documentElement.classList.remove('dark');
+      root.classList.remove('dark');
+      body.classList.remove('dark');
+      root.setAttribute('data-theme', 'light');
+      root.style.colorScheme = 'light';
       localStorage.setItem('fadeinbox_theme', 'light');
     }
   }, [isDark]);
