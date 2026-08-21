@@ -35,8 +35,12 @@ export default function AuthModal({ onClose }: AuthModalProps) {
         {/* Modal Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white shadow-md">
-              <ShieldCheck className="w-5 h-5" />
+            <div className="flex items-center justify-center w-11 h-11 rounded-2xl overflow-hidden shadow-md shadow-purple-500/20 ring-1 ring-purple-500/30 bg-slate-900 shrink-0">
+              <img
+                src="/favicon.svg"
+                alt="FadeInbox Logo"
+                className="w-full h-full object-cover"
+              />
             </div>
             <div>
               <h3 className="text-lg font-black text-slate-900 dark:text-white">

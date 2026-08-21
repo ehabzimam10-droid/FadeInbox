@@ -52,9 +52,13 @@ export default function Navbar({
     <header className="sticky top-0 z-40 w-full px-2 sm:px-4 py-2.5 sm:py-3 flex justify-center">
       <div className="w-fit max-w-[calc(100vw-1rem)] mx-auto flex items-center justify-center gap-1.5 sm:gap-2.5 md:gap-3 rounded-full bg-white/70 dark:bg-[#09090b]/80 backdrop-blur-2xl border border-slate-200/80 dark:border-white/5 px-2.5 sm:px-4 py-1.5 sm:py-2 shadow-lg shadow-slate-900/5 dark:shadow-black/40 transition-all duration-300 shrink-0">
         {/* Brand Logo & Name */}
-        <div className="flex items-center gap-2 shrink-0">
-          <div className="relative flex items-center justify-center w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-600 to-blue-600 text-white shadow-md shadow-purple-500/25 ring-1 ring-white/20">
-            <ShieldCheck className="w-4.5 h-4.5" />
+        <div className="flex items-center gap-2.5 shrink-0">
+          <div className="relative flex items-center justify-center w-8 h-8 rounded-xl overflow-hidden shadow-md shadow-purple-500/25 ring-1 ring-purple-500/30 bg-slate-900">
+            <img
+              src="/favicon.svg"
+              alt="FadeInbox Logo"
+              className="w-full h-full object-cover"
+            />
             <span className="absolute -top-0.5 -right-0.5 flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400 ring-2 ring-[#09090b]"></span>
