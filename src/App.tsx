@@ -29,6 +29,7 @@ import AuthModal from './components/AuthModal';
 import Footer from './components/Footer';
 import AuroraBackground from './components/AuroraBackground';
 import AdSenseUnit from './components/AdSenseUnit';
+import { Analytics } from '@vercel/analytics/react';
 
 const LOCAL_ACTIVE_ACCOUNTS_KEY = 'fadeinbox_active_accounts_v2';
 const LOCAL_SELECTED_ADDR_KEY = 'fadeinbox_selected_address_v2';
@@ -484,6 +485,9 @@ export default function App() {
       {showAuthModal && (
         <AuthModal onClose={() => setShowAuthModal(false)} />
       )}
+
+      {/* Vercel Analytics Tracker */}
+      <Analytics />
     </div>
   );
 }

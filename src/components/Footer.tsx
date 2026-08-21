@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   ShieldCheck,
@@ -12,9 +12,6 @@ import {
   ExternalLink,
   Sparkles,
   User,
-  CheckCircle2,
-  Server,
-  Globe2,
   AlertCircle,
   HelpCircle,
   ChevronDown,
@@ -24,6 +21,408 @@ import {
 } from 'lucide-react';
 
 type ModalType = 'privacy' | 'terms' | 'about' | 'contact' | null;
+
+interface LocalizedLegalData {
+  lastUpdated: string;
+  privacy: {
+    overviewTitle: string;
+    overviewText: string;
+    storageTitle: string;
+    storageText: string;
+    adsenseTitle: string;
+    adsenseIntro: string;
+    adsensePoints: string[];
+    adsenseOptOut: string;
+    gdprTitle: string;
+    gdprText: string;
+    ccpaTitle: string;
+    ccpaText: string;
+    securityTitle: string;
+    securityText: string;
+    cloudTitle: string;
+    cloudText: string;
+  };
+  terms: {
+    scopeTitle: string;
+    scopeText: string;
+    natureTitle: string;
+    natureText: string;
+    usageTitle: string;
+    usagePoints: string[];
+    prohibitedTitle: string;
+    prohibitedPoints: string[];
+    disclaimerTitle: string;
+    disclaimerText: string;
+  };
+  about: {
+    missionTitle: string;
+    missionText: string;
+    freeBadge: string;
+    freeSub: string;
+    providerBadge: string;
+    providerSub: string;
+    devTitle: string;
+    devRole: string;
+    devBio: string;
+    techTitle: string;
+    techText: string;
+  };
+  contact: {
+    subTitle: string;
+    responseSpeed: string;
+    faqs: Array<{ q: string; a: string }>;
+  };
+}
+
+const LEGAL_DICTIONARY: Record<string, LocalizedLegalData> = {
+  ar: {
+    lastUpdated: 'آخر تحديث: أغسطس 2026',
+    privacy: {
+      overviewTitle: '1. فلسفة الخصوصية أولاً واللا سجلات (Zero-Log)',
+      overviewText:
+        'في FadeInbox، نؤمن بأن الخصوصية حق أساسي للجميع. صُممت منصتنا من الصفر بحيث لا تتطلب منك أي بيانات شخصية، أو أرقام هواتف، أو عناوين بريد حقيقية للبدء في توليد العناوين المؤقتة.',
+      storageTitle: '2. الإتلاف الذاتي والتخزين المؤقت',
+      storageText:
+        'جميع العناوين ورسائل البريد الواردة مؤقتة بشكل صارم وتعيش فقط في الذاكرة المؤقتة خلال مدة الصلاحية المحددة. بمجرد انتهاء المؤقت، يتم إتلاف الرسائل والعناوين نهائياً وبلا رجعة دون حفظ أي أرشيف دائم.',
+      adsenseTitle: 'إفصاح إعلانات Google وملفات تعريف الارتباط (DART Cookies)',
+      adsenseIntro:
+        'تستخدم منصة FadeInbox خدمات إعلانية مقدمة من طرف ثالث، وتحديداً Google AdSense، لعرض الإعلانات عند زيارة موقعنا.',
+      adsensePoints: [
+        'تستخدم Google بصفتها مورداً لطرف ثالث ملفات تعريف الارتباط (Cookies) لعرض الإعلانات على موقعنا بناءً على زيارات المستخدمين السابقة لهذا الموقع أو لمواقع أخرى على شبكة الإنترنت.',
+        'يمكّن استخدام ملفات تعريف الارتباط الإعلانية Google وشركاءها من تقديم إعلانات مخصصة للمستخدمين استناداً إلى سجل تصفحهم العام.',
+      ],
+      adsenseOptOut: 'يمكن للمستخدمين إلغاء الاشتراك في الإعلانات المخصصة وتعديل إعدادات خصوصية الإعلانات في أي وقت عبر زيارة:',
+      gdprTitle: 'حقوق المستخدمين بموجب اللائحة الأوروبية العامة (GDPR)',
+      gdprText:
+        'يحق لكل مستخدم في الاتحاد الأوروبي: الحق في المعرفة والوصول، الحق في طلب مسح البيانات (الحق في النسيان)، والحق في تقييد المعالجة. نظراً لأن منصتنا لا تحتفظ بأي بيانات شخصية للزوار العاديين، فإن بياناتك محمية بشكل كامل وفوري.',
+      ccpaTitle: 'قانون خصوصية المستهلك في كاليفورنيا (CCPA)',
+      ccpaText:
+        'نحن نلتزم بصرامة بعدم بيع أي بيانات للمستخدمين ("Do Not Sell My Personal Information"). لا نقوم بتسويق أو تبادل أو تحقيق أي مكاسب مالية من تداول بياناتك الشخصية مع أي جهات خارجية.',
+      securityTitle: 'التشفير وحماية البيانات بنقل TLS 1.3',
+      securityText:
+        'يتم تشفير كافة الاتصالات بين متصفحك وخوادم البريد عبر بروتوكولات HTTPS/TLS 1.3 الحديثة والمحمية ضد أي تنصت أو اعتراض خارجي.',
+      cloudTitle: 'التخزين السحابي للمستخدمين المسجلين (Firebase Cloud Vault)',
+      cloudText:
+        'عند تسجيل الدخول الاختياري بحساب Google واستخدام الخزنة (Vault)، يتم تشفير وحفظ السجلات في Firebase Firestore تحت معرّف حسابك (UID) فقط، ولا يمكن لأي مستخدم آخر الوصول إليها، وتستطيع حذفها بضغطة زر في أي وقت.',
+    },
+    terms: {
+      scopeTitle: 'الموافقة على الشروط',
+      scopeText:
+        'باستخدامك لمنصة FadeInbox، فإنك توافق على الالتزام بهذه الشروط والأحكام. إذا كنت لا توافق على أي جزء منها، فيُرجى التوقف فوراً عن استخدام الخدمة.',
+      natureTitle: 'طبيعة الخدمة المؤقتة',
+      natureText:
+        'توفر المنصة خدمة إنشاء عناوين بريد إلكتروني مؤقتة تستقبل الرسائل لفترة محددة ثم تتلف ذاتياً لحماية صندوق بريدك الأساسي من الرسائل المزعجة وتأكيد الحسابات بشكل آمن.',
+      usageTitle: 'الاستخدامات الموصى بها والمشروعة',
+      usagePoints: [
+        'التسجيل في المواقع والمنتديات التي لا ترغب بمشاركتها بريدك الشخصي الحقيقي.',
+        'اختبار أنظمة إرسال البريد وتطبيقات الويب للمطورين (QA Testing).',
+        'تجنب القوائم البريدية المزعجة وحملات التسويق العشوائي.',
+      ],
+      prohibitedTitle: 'الأنشطة المحظورة قطعياً',
+      prohibitedPoints: [
+        'استخدام الخدمة في أي عمليات احتيال مالي، أو تزييف، أو انتهاك حقوق الغير.',
+        'محاولة إرسال برمجيات خبيثة أو هجمات حجب الخدمة (DDoS).',
+        'أي استخدام يخالف القوانين والأنظمة المعمول بها دولياً ومحلياً.',
+      ],
+      disclaimerTitle: 'تنبيه عدم استخدام الخدمة للحسابات البنكية أو الرسمية',
+      disclaimerText:
+        'نظراً لأن العناوين المؤقتة تُحذف تلقائياً، يُحظر ولا يُنصح إطلاقاً باستخدامها في إنشاء حسابات مصرفية، أو معاملات مالية، أو استرجاع كلمات مرور الحسابات الحكومية أو الحساسة، ولا تتحمل المنصة أي مسؤولية عن فقدان الرسائل بعد انتهاء صلاحيتها.',
+    },
+    about: {
+      missionTitle: 'رؤية منصة FadeInbox',
+      missionText:
+        'صُممت منصة FadeInbox لتكون الحل العصري الأسرع والأكثر أماناً لمشكلة الرسائل المزعجة وانتهاكات الخصوصية الرقمية. نوفر صندوق بريد مؤقت فوري يتلف تلقائياً ومجهز بتقنيات متعددة المحركات لضمان عدم توقف الخدمة أبداً.',
+      freeBadge: '100% مجانية',
+      freeSub: 'مجانية بالكامل للجميع',
+      providerBadge: '5 محركات',
+      providerSub: 'محركات بريد احتياطية',
+      devTitle: 'EHABOOO (إيهاب قاسم)',
+      devRole: 'Lead Software Architect & Creator of FadeInbox',
+      devBio:
+        'مطور برمجيات شغوف ببناء تطبيقات الويب الحديثة ذات الأداء الفائق والواجهات التفاعلية الأنيقة. تم بناء FadeInbox برؤية هندسية تضع خصوصية المستخدم والسرعة العالية في المقام الأول.',
+      techTitle: 'محركات البريد الخمسة المتكاملة (Multi-Provider Redundancy)',
+      techText:
+        'لضمان أعلى معايير الاستقرار وتجنب أي انقطاع، يتكامل FadeInbox بسلاسة مع 5 مزودي بريد عالميين (Mail.tm, Mail.gw, 1SecMail, Guerrilla Mail, DropMail.me).',
+    },
+    contact: {
+      subTitle: 'نسعد دائماً باستقبال اقتراحاتكم واستفساراتكم',
+      responseSpeed: 'متوسط وقت الرد: أقل من 24-48 ساعة عمل.',
+      faqs: [
+        {
+          q: 'هل الخدمة مجانية دائماً؟',
+          a: 'نعم، الخدمة الأساسية وتوليد العناوين المؤقتة وحمايتها مجانية بنسبة 100% وبدون أي رسوم خفية.',
+        },
+        {
+          q: 'هل يمكنني استرجاع بريد بعد انتهاء مدته؟',
+          a: 'العناوين العادية تتلف ذاتياً مع رسائلها. ولكن إذا قمت بتسجيل الدخول بـ Google وحفظت الرسائل المهمة في الخزنة (Vault)، فستظل محفوظة في حسابك بشكل دائم.',
+        },
+        {
+          q: 'هل يتم حظر الرسائل المزعجة؟',
+          a: 'نعم، بفضل نظام العزل الذاتي، لا يستطيع أي طرف ثالث تعقب عنوان بريدك الحقيقي لأنك تشارك فقط عنوانك المؤقت المعزول.',
+        },
+      ],
+    },
+  },
+  en: {
+    lastUpdated: 'Last Updated: August 2026',
+    privacy: {
+      overviewTitle: '1. Privacy-First & Zero-Log Guarantee',
+      overviewText:
+        'At FadeInbox, privacy is a fundamental human right. Our architecture is engineered from the ground up so you never need to provide personal identifiable information, phone numbers, or real email addresses to use our temporary mail services.',
+      storageTitle: '2. Ephemeral Storage & Self-Destruction',
+      storageText:
+        'All temporary addresses and received emails reside strictly in transient memory for the selected duration (10 minutes up to 7 days). Once the lifespan timer expires, messages are permanently purged from cache with zero recoverable trace.',
+      adsenseTitle: 'Google AdSense & DART Cookies Disclosure',
+      adsenseIntro:
+        'FadeInbox partners with third-party advertising vendors, including Google AdSense, to serve contextual and relevant ads when you visit our website.',
+      adsensePoints: [
+        'Google, as a third-party vendor, uses cookies (including DART cookies) to serve ads to users based on their visit to FadeInbox and other sites across the Internet.',
+        "Google's use of advertising cookies enables it and its network partners to serve tailored ads to your browser based on visiting our site and/or other sites on the Internet.",
+      ],
+      adsenseOptOut: 'Users may opt out of personalized advertising at any time by managing their settings via:',
+      gdprTitle: 'GDPR Compliance (European Union / UK)',
+      gdprText:
+        'Under the General Data Protection Regulation, EU and UK residents are entitled to: The Right of Access, Right to Erasure ("Right to be Forgotten"), and Right to Restrict Processing. Since FadeInbox does not retain permanent identification for guest sessions, your footprint remains zero.',
+      ccpaTitle: 'California Consumer Privacy Act (CCPA)',
+      ccpaText:
+        'FadeInbox strictly adheres to a "Do Not Sell My Personal Information" policy. We do not sell, rent, monetize, or broker personal consumer information to any third parties.',
+      securityTitle: 'End-to-End TLS 1.3 Transport Security',
+      securityText:
+        'All communications between your client device and email mailboxes are protected with state-of-the-art TLS 1.3 and HTTPS encryption, mitigating interception and eavesdropping.',
+      cloudTitle: 'Cloud Storage for Registered Users',
+      cloudText:
+        'If you opt in to sign in with Google to sync address history or preserve messages in the Vault, data is stored securely in Firebase Firestore scoped strictly to your authenticated UID. You retain complete control to delete any record at any time.',
+    },
+    terms: {
+      scopeTitle: 'Acceptance of Terms',
+      scopeText:
+        'By accessing or utilizing FadeInbox, you signify full agreement to these Terms of Service. If you disagree with any part of these provisions, you must cease using the platform immediately.',
+      natureTitle: 'Automated Disposable Utility',
+      natureText:
+        'FadeInbox provides an automated disposable email generator designed for receiving ephemeral messages, software QA testing, and protecting primary inboxes from unwanted solicitations.',
+      usageTitle: 'Authorized & Recommended Use Cases',
+      usagePoints: [
+        'Signing up for free trials, webinars, or forums without disclosing personal credentials.',
+        'Developer sandbox workflows, automated test pipelines, and QA inbox verification.',
+        'Circumventing aggressive marketing trackers and keeping primary mail accounts spam-free.',
+      ],
+      prohibitedTitle: 'Strictly Prohibited Conduct',
+      prohibitedPoints: [
+        'Engaging in cyber fraud, money laundering, phishing, or financial spoofing.',
+        'Attempting to inject malware, automate abusive traffic, or execute denial of service attacks.',
+        'Any unlawful conduct violating international telecommunication regulations.',
+      ],
+      disclaimerTitle: 'Critical Non-Permanent Account Warning',
+      disclaimerText:
+        'Because addresses self-destruct upon expiration, you MUST NOT use FadeInbox as the primary recovery email for banking, credit cards, government portals, or critical credentials. FadeInbox bears no liability for unrecoverable expired messages.',
+    },
+    about: {
+      missionTitle: 'The Mission of FadeInbox',
+      missionText:
+        'FadeInbox was created to deliver an ultra-fast, barrier-free, privacy-preserving disposable inbox engine. Our goal is to empower users worldwide against digital tracking, data brokers, and endless spam newsletters.',
+      freeBadge: '100% Free',
+      freeSub: 'Always Free for Everyone',
+      providerBadge: '5 Providers',
+      providerSub: 'Redundant Mail Engines',
+      devTitle: 'EHABOOO (إيهاب قاسم)',
+      devRole: 'Lead Software Architect & Creator of FadeInbox',
+      devBio:
+        'A passionate software engineer specialized in crafting high-performance, privacy-centric web applications and modern interactive UI experiences. FadeInbox is built with love and meticulous engineering.',
+      techTitle: '5-Engine Redundant Mail Adapter Architecture',
+      techText:
+        'FadeInbox features a custom multi-adapter engine that seamlessly aggregates and provides fallback redundancy across 5 global temp mail networks (Mail.tm, Mail.gw, 1SecMail, Guerrilla Mail, DropMail.me).',
+    },
+    contact: {
+      subTitle: 'Direct Support & Developer Inquiries',
+      responseSpeed: 'Average response turnaround: < 24-48 hours.',
+      faqs: [
+        {
+          q: 'Is FadeInbox completely free?',
+          a: 'Yes, generating temporary email addresses, receiving attachments, and instant self-destruction are 100% free.',
+        },
+        {
+          q: 'Can I restore an expired address?',
+          a: 'Standard temporary addresses purge upon timer expiration. However, registered Google accounts can bookmark critical emails to the permanent Cloud Vault.',
+        },
+        {
+          q: 'How does spam protection work?',
+          a: 'All incoming emails are isolated within ephemeral instances, preventing sender trackers and marketing bots from acquiring your real email.',
+        },
+      ],
+    },
+  },
+  zh: {
+    lastUpdated: '最后更新：2026年8月',
+    privacy: {
+      overviewTitle: '1. 隐私优先与零日志保证',
+      overviewText:
+        '在 FadeInbox，隐私是基本人权。我们的架构经过专门设计，您无需提供个人可识别信息、手机号或真实邮箱即可使用我们的临时邮箱服务。',
+      storageTitle: '2. 临时存储与自动销毁',
+      storageText:
+        '所有临时地址和接收到的邮件仅在选定的有效期内保存在临时内存中。一旦计时器到期，邮件将从缓存中永久清除，不留痕迹。',
+      adsenseTitle: 'Google AdSense 与 DART Cookie 公告',
+      adsenseIntro:
+        'FadeInbox 与第三方广告提供商（包括 Google AdSense）合作，在您访问我们的网站时展示相关广告。',
+      adsensePoints: [
+        'Google 作为第三方供应商，使用 Cookie（包括 DART Cookie）根据用户访问 FadeInbox 和互联网上其他网站的记录向其投放广告。',
+        'Google 对广告 Cookie 的使用使其及其合作伙伴能够根据用户访问本网站和/或互联网其他网站的情况向您的浏览器投放广告。',
+      ],
+      adsenseOptOut: '用户可以随时通过以下链接选择退出个性化广告：',
+      gdprTitle: 'GDPR 合规性（欧盟与英国）',
+      gdprText:
+        '根据《通用数据保护条例》(GDPR)，用户享有知情权、访问权、被遗忘权和限制处理权。由于 FadeInbox 不保留访客的永久身份信息，您的数字足迹始终为零。',
+      ccpaTitle: '加州消费者隐私法案 (CCPA)',
+      ccpaText:
+        'FadeInbox 严格遵守“不出售我的个人信息”政策。我们绝不会向任何第三方出售、出租或交易用户的个人信息。',
+      securityTitle: '端到端 TLS 1.3 传输加密',
+      securityText:
+        '您的设备与邮箱之间的所有网络通信均受到行业顶级的 TLS 1.3 和 HTTPS 加密保护，有效防止任何中间人监听。',
+      cloudTitle: '已登录用户的云端保险库 (Firebase Cloud Vault)',
+      cloudText:
+        '如果您选择使用 Google 账号登录以同步历史记录或永久保存邮件，数据将严格隔离加密保存在 Firebase Firestore 中，您可随时一键删除。',
+    },
+    terms: {
+      scopeTitle: '条款接受与服务范围',
+      scopeText:
+        '访问或使用 FadeInbox 即表示您完全同意这些服务条款。如果您不同意这些规定的任何部分，请立即停止使用本平台。',
+      natureTitle: '自动化即用即弃临时邮箱',
+      natureText:
+        'FadeInbox 提供自动化临时邮箱生成服务，专为接收临时验证邮件、软件开发测试以及保护主邮箱免受垃圾邮件干扰而设计。',
+      usageTitle: '授权与推荐使用场景',
+      usagePoints: [
+        '注册试用、论坛或网页时，无需泄露真实的个人主邮箱。',
+        '开发者沙盒测试、自动化流水线测试以及 QA 收件箱验证。',
+        '阻断营销追踪器，保持个人主邮箱清新无垃圾。',
+      ],
+      prohibitedTitle: '严禁的滥用行为',
+      prohibitedPoints: [
+        '从事网络欺诈、洗钱、钓鱼攻击或金融诈骗活动。',
+        '尝试注入恶意软件、自动化恶意流量或发起 DDoS 拒绝服务攻击。',
+        '违反当地或国际法律法规的任何非法行为。',
+      ],
+      disclaimerTitle: '重要非永久账户安全警告',
+      disclaimerText:
+        '由于临时邮箱到期即自动销毁，切勿将 FadeInbox 用于银行账户、信用卡、政务服务或关键账户的安全恢复邮箱。FadeInbox 对过期邮件的丢失概不负责。',
+    },
+    about: {
+      missionTitle: 'FadeInbox 的使命',
+      missionText:
+        'FadeInbox 旨在提供一个超快速、无门槛、尊重隐私的一次性收件箱引擎。我们的目标是保护全球用户免受追踪、数据交易和垃圾邮件的困扰。',
+      freeBadge: '100% 免费',
+      freeSub: '始终面向全员免费',
+      providerBadge: '5 大引擎',
+      providerSub: '多线路冗余容灾',
+      devTitle: 'EHABOOO (إيهاب قاسم)',
+      devRole: '主创软件架构师 & FadeInbox 创始人',
+      devBio:
+        '热衷于打造高性能、注重隐私的现代 Web 应用和精致交互 UI。FadeInbox 倾注了用心与精密的工程设计。',
+      techTitle: '五大引擎自适应多核架构',
+      techText:
+        'FadeInbox 拥有自研多适配器引擎，可无缝聚合 5 大全球临时邮件网络 (Mail.tm, Mail.gw, 1SecMail, Guerrilla Mail, DropMail.me) 并实现毫秒级自动容灾。',
+    },
+    contact: {
+      subTitle: '直接支持与开发者联系',
+      responseSpeed: '平均回复时间：24-48 个工作小时内。',
+      faqs: [
+        {
+          q: 'FadeInbox 是完全免费的吗？',
+          a: '是的，生成临时邮箱地址、接收邮件及附件以及自动自毁功能 100% 免费。',
+        },
+        {
+          q: '过期后的邮箱可以恢复吗？',
+          a: '普通临时邮箱到期即彻底销毁。但如果您登录 Google 账号并将重要邮件保存至云端保险库，该邮件将永久保存。',
+        },
+        {
+          q: '防垃圾邮件是如何工作的？',
+          a: '所有接收到的邮件都在隔离沙盒中处理，发件人的追踪像素和营销机器人永远无法探测到您的真实身份。',
+        },
+      ],
+    },
+  },
+  es: {
+    lastUpdated: 'Última actualización: Agosto 2026',
+    privacy: {
+      overviewTitle: '1. Privacidad Primero y Cero Registros',
+      overviewText:
+        'En FadeInbox, la privacidad es un derecho humano. No recopilamos datos personales, números de teléfono ni correos reales para usar nuestro servicio temporal.',
+      storageTitle: '2. Almacenamiento Efímero y Autodestrucción',
+      storageText:
+        'Todas las direcciones y correos entrantes residen estrictamente en la memoria temporal durante el tiempo seleccionado y se purgan permanentemente al expirar.',
+      adsenseTitle: 'Divulgación de Google AdSense y Cookies DART',
+      adsenseIntro:
+        'FadeInbox utiliza Google AdSense para mostrar anuncios relevantes a nuestros visitantes.',
+      adsensePoints: [
+        'Google utiliza cookies para publicar anuncios basados en las visitas anteriores de los usuarios a este y otros sitios web.',
+        'El uso de cookies publicitarias permite a Google y sus socios mostrar anuncios basados en su navegación en Internet.',
+      ],
+      adsenseOptOut: 'Puede inhabilitar la publicidad personalizada en cualquier momento visitando:',
+      gdprTitle: 'Cumplimiento del RGPD (Unión Europea)',
+      gdprText:
+        'Cumplimos plenamente con los derechos de acceso, rectificación y supresión (derecho al olvido) del Reglamento General de Protección de Datos.',
+      ccpaTitle: 'Ley de Privacidad del Consumidor de California (CCPA)',
+      ccpaText:
+        'FadeInbox no vende ni monetiza su información personal a terceros bajo ninguna circunstancia.',
+      securityTitle: 'Seguridad y Cifrado TLS 1.3',
+      securityText:
+        'Todas las conexiones están protegidas con cifrado TLS 1.3 y HTTPS de última generación.',
+      cloudTitle: 'Almacenamiento Seguro para Usuarios Registrados',
+      cloudText:
+        'Los correos guardados en la Bóveda se almacenan de forma segura en Firebase Firestore vinculados únicamente a su cuenta.',
+    },
+    terms: {
+      scopeTitle: 'Aceptación de los Términos',
+      scopeText:
+        'El uso de FadeInbox implica la aceptación plena de estos términos de servicio.',
+      natureTitle: 'Utilidad Desechable Automatizada',
+      natureText:
+        'FadeInbox está diseñado para recibir correos temporales, pruebas de software y evitar el spam en su bandeja de entrada.',
+      usageTitle: 'Usos Permitidos',
+      usagePoints: [
+        'Registros en foros y pruebas sin revelar su correo personal.',
+        'Pruebas de desarrollo y control de calidad (QA).',
+        'Evitar el spam y listas de distribución masiva.',
+      ],
+      prohibitedTitle: 'Actividades Prohibidas',
+      prohibitedPoints: [
+        'Fraude cibernético, phishing o actividades ilegales.',
+        'Envío de malware o ataques de denegación de servicio (DDoS).',
+      ],
+      disclaimerTitle: 'Advertencia de Uso No Permanente',
+      disclaimerText:
+        'No use FadeInbox para cuentas bancarias o servicios críticos, ya que las direcciones expiran automáticamente.',
+    },
+    about: {
+      missionTitle: 'Misión de FadeInbox',
+      missionText:
+        'FadeInbox fue creado para ofrecer un servicio de correo temporal ultrarrápido, seguro y respetuoso con la privacidad.',
+      freeBadge: '100% Gratis',
+      freeSub: 'Siempre gratis para todos',
+      providerBadge: '5 Proveedores',
+      providerSub: 'Redundancia automática',
+      devTitle: 'EHABOOO (إيهاب قاسم)',
+      devRole: 'Arquitecto Líder y Creador',
+      devBio:
+        'Ingeniero de software especializado en aplicaciones web de alto rendimiento y enfocadas en la privacidad del usuario.',
+      techTitle: 'Arquitectura Multi-Motor',
+      techText:
+        'Integración con 5 redes de correo temporal globales para garantizar la máxima disponibilidad.',
+    },
+    contact: {
+      subTitle: 'Soporte y Contacto Directo',
+      responseSpeed: 'Tiempo promedio de respuesta: < 24-48 horas.',
+      faqs: [
+        {
+          q: '¿FadeInbox es completamente gratis?',
+          a: 'Sí, todas las funciones de correo temporal y autodestrucción son 100% gratuitas.',
+        },
+        {
+          q: '¿Puedo recuperar un correo expirado?',
+          a: 'Las direcciones estándar se purgan al expirar. Solo los correos guardados en la Bóveda con cuenta Google permanecen.',
+        },
+      ],
+    },
+  },
+};
 
 export default function Footer() {
   const { t, i18n } = useTranslation();
@@ -36,9 +435,19 @@ export default function Footer() {
   const [aboutTab, setAboutTab] = useState<'about' | 'developer' | 'tech'>('about');
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
-  const isRtl = i18n.language === 'ar';
+  const currentLangCode = i18n.language || 'en';
+  const legalData = LEGAL_DICTIONARY[currentLangCode] || LEGAL_DICTIONARY.en;
   const currentYear = new Date().getFullYear();
   const developerEmail = 'EHABOOO.FadeInbox@gmail.com';
+
+  // Close modals on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setActiveModal(null);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -185,9 +594,14 @@ export default function Footer() {
 
       {/* ===================== MODALS ===================== */}
 
-      {/* 1. Privacy Policy Modal (Comprehensive & Google AdSense / GDPR / CCPA Compliant) */}
+      {/* 1. Privacy Policy Modal */}
       {activeModal === 'privacy' && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75 backdrop-blur-md animate-in fade-in duration-200">
+        <div
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setActiveModal(null);
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75 backdrop-blur-md animate-in fade-in duration-200"
+        >
           <div className="w-full max-w-2xl p-5 sm:p-8 rounded-[28px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto custom-scrollbar">
             {/* Modal Header */}
             <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
@@ -203,7 +617,7 @@ export default function Footer() {
                     </span>
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400">
-                    {isRtl ? 'آخر تحديث: أغسطس 2026' : 'Last Updated: August 2026'}
+                    {legalData.lastUpdated}
                   </p>
                 </div>
               </div>
@@ -260,76 +674,47 @@ export default function Footer() {
               </button>
             </div>
 
-            {/* Tab Content 1: Overview */}
+            {/* Tab 1: Overview */}
             {privacyTab === 'overview' && (
               <div className="space-y-4 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                 <div className="p-4 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/60 dark:border-indigo-800/40 space-y-2">
                   <div className="flex items-center gap-2 text-indigo-900 dark:text-indigo-200 font-bold text-sm">
                     <ShieldCheck className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                    <span>{isRtl ? '1. فلسفة الخصوصية أولاً واللا سجلات (Zero-Log)' : '1. Privacy-First & Zero-Log Guarantee'}</span>
+                    <span>{legalData.privacy.overviewTitle}</span>
                   </div>
-                  <p>
-                    {isRtl
-                      ? 'في FadeInbox، نؤمن بأن الخصوصية حق أساسي للجميع. صُممت منصتنا من الصفر بحيث لا تتطلب منك أي بيانات شخصية، أو أرقام هواتف، أو عناوين بريد حقيقية للبدء في توليد العناوين المؤقتة.'
-                      : 'At FadeInbox, privacy is a fundamental human right. Our architecture is engineered from the ground up so you never need to provide personal identifiable information, phone numbers, or real email addresses to use our temporary mail services.'}
-                  </p>
+                  <p>{legalData.privacy.overviewText}</p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/60 space-y-2">
                   <h4 className="font-bold text-slate-900 dark:text-white text-xs">
-                    {isRtl ? '2. الإتلاف الذاتي والتخزين المؤقت' : '2. Ephemeral Storage & Self-Destruction'}
+                    {legalData.privacy.storageTitle}
                   </h4>
-                  <p>
-                    {isRtl
-                      ? 'جميع العناوين ورسائل البريد الواردة مؤقتة بشكل صارم وتعيش فقط في الذاكرة المؤقتة خلال مدة الصلاحية المحددة (من 10 دقائق حتى 7 أيام). بمجرد انتهاء المؤقت، يتم إتلاف الرسائل والعناوين نهائياً وبلا رجعة دون حفظ أي أرشيف دائم.'
-                      : 'All temporary addresses and received emails reside strictly in transient memory for the selected duration (10 minutes up to 7 days). Once the lifespan timer expires, messages are permanently purged from cache with zero recoverable trace.'}
-                  </p>
+                  <p>{legalData.privacy.storageText}</p>
                 </div>
               </div>
             )}
 
-            {/* Tab Content 2: Google AdSense & Cookies (Crucial for AdSense Approval) */}
+            {/* Tab 2: AdSense & Cookies */}
             {privacyTab === 'adsense' && (
               <div className="space-y-4 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                 <div className="p-4 rounded-2xl bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/40 space-y-2">
                   <div className="flex items-center gap-2 text-amber-900 dark:text-amber-200 font-bold text-sm">
                     <Award className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                    <span>{isRtl ? 'إفصاح إعلانات Google وملفات تعريف الارتباط (DART Cookies)' : 'Google AdSense & DART Cookies Disclosure'}</span>
+                    <span>{legalData.privacy.adsenseTitle}</span>
                   </div>
-                  <p>
-                    {isRtl
-                      ? 'تستخدم منصة FadeInbox خدمات إعلانية مقدمة من طرف ثالث، وتحديداً Google AdSense، لعرض الإعلانات عند زيارة موقعنا.'
-                      : 'FadeInbox partners with third-party advertising vendors, including Google AdSense, to serve contextual and relevant ads when you visit our website.'}
-                  </p>
+                  <p>{legalData.privacy.adsenseIntro}</p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/60 space-y-2">
-                  <h4 className="font-bold text-slate-900 dark:text-white text-xs">
-                    {isRtl ? 'كيف تستخدم Google ملفات تعريف الارتباط؟' : 'How Google Uses Advertising Cookies'}
-                  </h4>
                   <ul className="list-disc list-inside space-y-1.5 text-slate-600 dark:text-slate-300">
-                    <li>
-                      {isRtl
-                        ? 'تستخدم Google بصفتها مورداً لطرف ثالث ملفات تعريف الارتباط (Cookies) لعرض الإعلانات على موقعنا بناءً على زيارات المستخدمين السابقة لهذا الموقع أو لمواقع أخرى على شبكة الإنترنت.'
-                        : 'Google, as a third-party vendor, uses cookies (including DART cookies) to serve ads to users based on their visit to FadeInbox and other sites across the Internet.'}
-                    </li>
-                    <li>
-                      {isRtl
-                        ? 'يمكّن استخدام ملفات تعريف الارتباط الإعلانية Google وشركاءها من تقديم إعلانات مخصصة للمستخدمين استناداً إلى سجل تصفحهم العام.'
-                        : 'Google\'s use of advertising cookies enables it and its network partners to serve tailored ads to your browser based on visiting our site and/or other sites on the Internet.'}
-                    </li>
+                    {legalData.privacy.adsensePoints.map((pt, i) => (
+                      <li key={i}>{pt}</li>
+                    ))}
                   </ul>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/60 dark:border-indigo-800/40 space-y-2">
-                  <h4 className="font-bold text-indigo-900 dark:text-indigo-200 text-xs">
-                    {isRtl ? 'كيفية إلغاء الاشتراك والتحكم في الإعلانات' : 'User Choice & Ad Opt-Out Options'}
-                  </h4>
-                  <p>
-                    {isRtl
-                      ? 'يمكن للمستخدمين إلغاء الاشتراك في الإعلانات المخصصة وتعديل إعدادات خصوصية الإعلانات في أي وقت عبر زيارة:'
-                      : 'Users may opt out of personalized advertising at any time by managing their settings via:'}
-                  </p>
+                  <p className="font-bold text-indigo-900 dark:text-indigo-200">{legalData.privacy.adsenseOptOut}</p>
                   <div className="flex flex-wrap items-center gap-2 pt-1">
                     <a
                       href="https://www.google.com/settings/ads"
@@ -354,57 +739,41 @@ export default function Footer() {
               </div>
             )}
 
-            {/* Tab Content 3: GDPR & CCPA */}
+            {/* Tab 3: GDPR & CCPA */}
             {privacyTab === 'gdpr' && (
               <div className="space-y-4 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                 <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/60 space-y-2">
                   <h4 className="font-bold text-slate-900 dark:text-white text-xs">
-                    {isRtl ? 'حقوق المستخدمين بموجب اللائحة الأوروبية العامة (GDPR)' : 'GDPR Compliance (European Union / UK)'}
+                    {legalData.privacy.gdprTitle}
                   </h4>
-                  <p>
-                    {isRtl
-                      ? 'يحق لكل مستخدم في الاتحاد الأوروبي: الحق في المعرفة والوصول، الحق في طلب مسح البيانات (الحق في النسيان)، والحق في تقييد المعالجة. نظراً لأن منصتنا لا تحتفظ بأي بيانات شخصية للزوار العاديين، فإن بياناتك محمية بشكل كامل وفوري.'
-                      : 'Under the General Data Protection Regulation, EU and UK residents are entitled to: The Right of Access, Right to Erasure ("Right to be Forgotten"), and Right to Restrict Processing. Since FadeInbox does not retain permanent identification for guest sessions, your footprint remains zero.'}
-                  </p>
+                  <p>{legalData.privacy.gdprText}</p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/60 space-y-2">
                   <h4 className="font-bold text-slate-900 dark:text-white text-xs">
-                    {isRtl ? 'قانون خصوصية المستهلك في كاليفورنيا (CCPA)' : 'California Consumer Privacy Act (CCPA)'}
+                    {legalData.privacy.ccpaTitle}
                   </h4>
-                  <p>
-                    {isRtl
-                      ? 'نحن نلتزم بصرامة بعدم بيع أي بيانات للمستخدمين ("We Do NOT Sell Your Personal Information"). لا نقوم بتسويق أو تبادل أو تحقيق أي مكاسب مالية من تداول بياناتك الشخصية مع أي جهات خارجية.'
-                      : 'FadeInbox strictly adheres to a "Do Not Sell My Personal Information" policy. We do not sell, rent, monetize, or broker personal consumer information to any third parties.'}
-                  </p>
+                  <p>{legalData.privacy.ccpaText}</p>
                 </div>
               </div>
             )}
 
-            {/* Tab Content 4: Security & Cloud Storage */}
+            {/* Tab 4: Security & Cloud */}
             {privacyTab === 'security' && (
               <div className="space-y-4 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                 <div className="p-4 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/60 dark:border-indigo-800/40 space-y-2">
                   <div className="flex items-center gap-2 text-indigo-900 dark:text-indigo-200 font-bold text-sm">
                     <Lock className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                    <span>{isRtl ? 'التشفير وحماية البيانات بنقل TLS 1.3' : 'End-to-End TLS 1.3 Transport Security'}</span>
+                    <span>{legalData.privacy.securityTitle}</span>
                   </div>
-                  <p>
-                    {isRtl
-                      ? 'يتم تشفير كافة الاتصالات بين متصفحك وخوادم البريد عبر بروتوكولات HTTPS/TLS 1.3 الحديثة والمحمية ضد أي تنصت أو اعتراض خارجي.'
-                      : 'All communications between your client device and email mailboxes are protected with state-of-the-art TLS 1.3 and HTTPS encryption, mitigating interception and eavesdropping.'}
-                  </p>
+                  <p>{legalData.privacy.securityText}</p>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/60 space-y-2">
                   <h4 className="font-bold text-slate-900 dark:text-white text-xs">
-                    {isRtl ? 'التخزين السحابي للمستخدمين المسجلين (Firebase Cloud Vault)' : 'Cloud Storage for Registered Users'}
+                    {legalData.privacy.cloudTitle}
                   </h4>
-                  <p>
-                    {isRtl
-                      ? 'عند تسجيل الدخول الاختياري بحساب Google واستخدام الخزنة (Vault)، يتم تشفير وحفظ السجلات في Firebase Firestore تحت معرّف حسابك (UID) فقط، ولا يمكن لأي مستخدم آخر الوصول إليها، وتستطيع حذفها بضغطة زر في أي وقت.'
-                      : 'If you opt in to sign in with Google to sync address history or preserve messages in the Vault, data is stored securely in Firebase Firestore scoped strictly to your authenticated UID. You retain complete control to delete any record at any time.'}
-                  </p>
+                  <p>{legalData.privacy.cloudText}</p>
                 </div>
               </div>
             )}
@@ -425,9 +794,14 @@ export default function Footer() {
         </div>
       )}
 
-      {/* 2. Terms of Service Modal (Professional & Full Compliance) */}
+      {/* 2. Terms of Service Modal */}
       {activeModal === 'terms' && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75 backdrop-blur-md animate-in fade-in duration-200">
+        <div
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setActiveModal(null);
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75 backdrop-blur-md animate-in fade-in duration-200"
+        >
           <div className="w-full max-w-2xl p-5 sm:p-8 rounded-[28px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto custom-scrollbar">
             {/* Modal Header */}
             <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
@@ -440,7 +814,7 @@ export default function Footer() {
                     {t('termsOfService')}
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400">
-                    {isRtl ? 'اتفاقية الاستخدام والشروط القانونية' : 'Legal Agreement & Terms of Use'}
+                    {legalData.lastUpdated}
                   </p>
                 </div>
               </div>
@@ -462,7 +836,7 @@ export default function Footer() {
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                {isRtl ? '1. نطاق الخدمة' : '1. Scope of Service'}
+                {legalData.terms.scopeTitle}
               </button>
               <button
                 onClick={() => setTermsTab('usage')}
@@ -472,7 +846,7 @@ export default function Footer() {
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                {isRtl ? '2. الاستخدام المسموح' : '2. Permitted Use'}
+                {legalData.terms.usageTitle}
               </button>
               <button
                 onClick={() => setTermsTab('prohibited')}
@@ -482,7 +856,7 @@ export default function Footer() {
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                {isRtl ? '3. المحظورات' : '3. Prohibitions'}
+                {legalData.terms.prohibitedTitle}
               </button>
               <button
                 onClick={() => setTermsTab('disclaimer')}
@@ -492,7 +866,7 @@ export default function Footer() {
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                {isRtl ? '4. إخلاء المسؤولية' : '4. Liability & Disclaimers'}
+                {legalData.terms.disclaimerTitle}
               </button>
             </div>
 
@@ -501,23 +875,15 @@ export default function Footer() {
               <div className="space-y-4 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                 <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/60 space-y-2">
                   <h4 className="font-bold text-slate-900 dark:text-white text-xs">
-                    {isRtl ? 'الموافقة على الشروط' : 'Acceptance of Terms'}
+                    {legalData.terms.scopeTitle}
                   </h4>
-                  <p>
-                    {isRtl
-                      ? 'باستخدامك لمنصة FadeInbox، فإنك توافق على الالتزام بهذه الشروط والأحكام. إذا كنت لا توافق على أي جزء منها، فيُرجى التوقف فوراً عن استخدام الخدمة.'
-                      : 'By accessing or utilizing FadeInbox, you signify full agreement to these Terms of Service. If you disagree with any part of these provisions, you must cease using the platform immediately.'}
-                  </p>
+                  <p>{legalData.terms.scopeText}</p>
                 </div>
                 <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/60 space-y-2">
                   <h4 className="font-bold text-slate-900 dark:text-white text-xs">
-                    {isRtl ? 'طبيعة الخدمة المؤقتة' : 'Automated Disposable Utility'}
+                    {legalData.terms.natureTitle}
                   </h4>
-                  <p>
-                    {isRtl
-                      ? 'توفر المنصة خدمة إنشاء عناوين بريد إلكتروني مؤقتة تستقبل الرسائل لفترة محددة ثم تتلف ذاتياً لحماية صندوق بريدك الأساسي من الرسائل المزعجة وتأكيد الحسابات بشكل آمن.'
-                      : 'FadeInbox provides an automated disposable email generator designed for receiving ephemeral messages, software QA testing, and protecting primary inboxes from unwanted solicitations.'}
-                  </p>
+                  <p>{legalData.terms.natureText}</p>
                 </div>
               </div>
             )}
@@ -526,12 +892,12 @@ export default function Footer() {
               <div className="space-y-4 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                 <div className="p-4 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200/60 dark:border-emerald-800/40 space-y-2">
                   <h4 className="font-bold text-emerald-900 dark:text-emerald-200 text-xs">
-                    {isRtl ? 'الاستخدامات الموصى بها والمشروعة' : 'Authorized & Recommended Use Cases'}
+                    {legalData.terms.usageTitle}
                   </h4>
                   <ul className="list-disc list-inside space-y-1.5">
-                    <li>{isRtl ? 'التسجيل في المواقع والمنتديات التي لا ترغب بمشاركتها بريدك الشخصي الحقيقي.' : 'Signing up for free trials, webinars, or forums without disclosing personal credentials.'}</li>
-                    <li>{isRtl ? 'اختبار أنظمة إرسال البريد وتطبيقات الويب والمطورين (QA Testing).' : 'Developer sandbox workflows, automated test pipelines, and QA inbox verification.'}</li>
-                    <li>{isRtl ? 'تجنب القوائم البريدية المزعجة وحملات التسويق العشوائي.' : 'Circumventing aggressive marketing trackers and keeping primary mail accounts spam-free.'}</li>
+                    {legalData.terms.usagePoints.map((pt, i) => (
+                      <li key={i}>{pt}</li>
+                    ))}
                   </ul>
                 </div>
               </div>
@@ -542,12 +908,12 @@ export default function Footer() {
                 <div className="p-4 rounded-2xl bg-rose-50/70 dark:bg-rose-950/40 border border-rose-200/60 dark:border-rose-800/40 space-y-2">
                   <div className="flex items-center gap-2 text-rose-900 dark:text-rose-200 font-bold text-xs">
                     <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400" />
-                    <span>{isRtl ? 'الأنشطة المحظورة قطعياً' : 'Strictly Prohibited Conduct'}</span>
+                    <span>{legalData.terms.prohibitedTitle}</span>
                   </div>
                   <ul className="list-disc list-inside space-y-1.5 text-rose-900/90 dark:text-rose-200/90">
-                    <li>{isRtl ? 'استخدام الخدمة في أي عمليات احتيال مالي، أو تزييف، أو انتهاك حقوق الغير.' : 'Engaging in cyber fraud, money laundering, phishing, or financial spoofing.'}</li>
-                    <li>{isRtl ? 'محاولة إرسال برمجيات خبيثة أو هجمات حجب الخدمة (DDoS).' : 'Attempting to inject malware, automate abusive traffic, or execute denial of service attacks.'}</li>
-                    <li>{isRtl ? 'أي استخدام يخالف القوانين والأنظمة المعمول بها دولياً ومحلياً.' : 'Any unlawful conduct violating international telecommunication regulations.'}</li>
+                    {legalData.terms.prohibitedPoints.map((pt, i) => (
+                      <li key={i}>{pt}</li>
+                    ))}
                   </ul>
                 </div>
               </div>
@@ -557,13 +923,9 @@ export default function Footer() {
               <div className="space-y-4 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                 <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/60 space-y-2">
                   <h4 className="font-bold text-slate-900 dark:text-white text-xs">
-                    {isRtl ? 'تنبيه عدم استخدام الخدمة للحسابات البنكية أو الرسمية' : 'Critical Non-Permanent Account Warning'}
+                    {legalData.terms.disclaimerTitle}
                   </h4>
-                  <p>
-                    {isRtl
-                      ? 'نظراً لأن العناوين المؤقتة تُحذف تلقائياً، يُحظر ولا يُنصح إطلاقاً باستخدامها في إنشاء حسابات مصرفية، أو معاملات مالية، أو استرجاع كلمات مرور الحسابات الحكومية أو الحساسة، ولا تتحمل المنصة أي مسؤولية عن فقدان الرسائل بعد انتهاء صلاحيتها.'
-                      : 'Because addresses self-destruct upon expiration, you MUST NOT use FadeInbox as the primary recovery email for banking, credit cards, government portals, or critical credentials. FadeInbox bears no liability for unrecoverable expired messages.'}
-                  </p>
+                  <p>{legalData.terms.disclaimerText}</p>
                 </div>
               </div>
             )}
@@ -586,7 +948,12 @@ export default function Footer() {
 
       {/* 3. About Platform & Developer Modal */}
       {activeModal === 'about' && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75 backdrop-blur-md animate-in fade-in duration-200">
+        <div
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setActiveModal(null);
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75 backdrop-blur-md animate-in fade-in duration-200"
+        >
           <div className="w-full max-w-xl p-5 sm:p-8 rounded-[28px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto custom-scrollbar">
             {/* Modal Header */}
             <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
@@ -651,23 +1018,19 @@ export default function Footer() {
                 <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-50/80 to-purple-50/80 dark:from-indigo-950/40 dark:to-purple-950/40 border border-indigo-200/60 dark:border-indigo-800/40 space-y-2">
                   <div className="flex items-center gap-2 font-bold text-sm text-slate-900 dark:text-white">
                     <Zap className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                    <span>{isRtl ? 'رؤية منصة FadeInbox' : 'The Mission of FadeInbox'}</span>
+                    <span>{legalData.about.missionTitle}</span>
                   </div>
-                  <p>
-                    {isRtl
-                      ? 'صُممت منصة FadeInbox لتكون الحل العصري الأسرع والأكثر أماناً لمشكلة الرسائل المزعجة (Spam) وانتهاكات الخصوصية الرقمية. نوفر صندوق بريد مؤقت فوري يتلف تلقائياً ومجهز بتقنيات متعددة المحركات لضمان عدم توقف الخدمة أبداً.'
-                      : 'FadeInbox was created to deliver an ultra-fast, barrier-free, privacy-preserving disposable inbox engine. Our goal is to empower users worldwide against digital tracking, data brokers, and endless spam newsletters.'}
-                  </p>
+                  <p>{legalData.about.missionText}</p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2.5">
                   <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/60 text-center">
-                    <div className="text-base font-black text-indigo-600 dark:text-indigo-400 font-mono">100% Free</div>
-                    <div className="text-[11px] text-slate-500 dark:text-slate-400">{isRtl ? 'مجانية بالكامل للجميع' : 'Always Free for Everyone'}</div>
+                    <div className="text-base font-black text-indigo-600 dark:text-indigo-400 font-mono">{legalData.about.freeBadge}</div>
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400">{legalData.about.freeSub}</div>
                   </div>
                   <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/60 text-center">
-                    <div className="text-base font-black text-purple-600 dark:text-purple-400 font-mono">5 Providers</div>
-                    <div className="text-[11px] text-slate-500 dark:text-slate-400">{isRtl ? 'محركات بريد احتياطية' : 'Redundant Mail Engines'}</div>
+                    <div className="text-base font-black text-purple-600 dark:text-purple-400 font-mono">{legalData.about.providerBadge}</div>
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400">{legalData.about.providerSub}</div>
                   </div>
                 </div>
               </div>
@@ -683,20 +1046,16 @@ export default function Footer() {
                     </div>
                     <div>
                       <h4 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-1.5">
-                        <span>EHABOOO (إيهاب قاسم)</span>
+                        <span>{legalData.about.devTitle}</span>
                         <Sparkles className="w-4 h-4 text-amber-500" />
                       </h4>
                       <p className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold">
-                        Lead Software Architect & Creator of FadeInbox
+                        {legalData.about.devRole}
                       </p>
                     </div>
                   </div>
 
-                  <p>
-                    {isRtl
-                      ? 'مطور برمجيات شغوف ببناء تطبيقات الويب الحديثة ذات الأداء الفائق والواجهات التفاعلية الأنيقة. تم بناء FadeInbox برؤية هندسية تضع خصوصية المستخدم والسرعة العالية في المقام الأول.'
-                      : 'A passionate software engineer specialized in crafting high-performance, privacy-centric web applications and modern interactive UI experiences. FadeInbox is built with love and meticulous engineering.'}
-                  </p>
+                  <p>{legalData.about.devBio}</p>
                 </div>
 
                 {/* Email Box */}
@@ -714,7 +1073,7 @@ export default function Footer() {
                     {copiedEmail ? (
                       <>
                         <Check className="w-3.5 h-3.5 text-emerald-500" />
-                        <span>{isRtl ? 'تم النسخ' : 'Copied'}</span>
+                        <span>{t('copied')}</span>
                       </>
                     ) : (
                       <>
@@ -733,13 +1092,9 @@ export default function Footer() {
                 <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/60 space-y-2">
                   <h4 className="font-bold text-slate-900 dark:text-white text-xs flex items-center gap-1.5">
                     <Layers className="w-4 h-4 text-indigo-500" />
-                    <span>{isRtl ? 'محركات البريد الخمسة المتكاملة (Multi-Provider Redundancy)' : '5-Engine Redundant Mail Adapter Architecture'}</span>
+                    <span>{legalData.about.techTitle}</span>
                   </h4>
-                  <p>
-                    {isRtl
-                      ? 'لضمان أعلى معايير الاستقرار وتجنب أي انقطاع، يتكامل FadeInbox بسلاسة مع 5 مزودي بريد عالميين:'
-                      : 'FadeInbox features a custom multi-adapter engine that seamlessly aggregates and provides fallback redundancy across 5 global temp mail networks:'}
-                  </p>
+                  <p>{legalData.about.techText}</p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1 font-mono text-[11px]">
                     <span className="p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 text-center font-bold">1. Mail.tm</span>
                     <span className="p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 text-center font-bold">2. Mail.gw</span>
@@ -767,7 +1122,12 @@ export default function Footer() {
 
       {/* 4. Contact & Support Modal */}
       {activeModal === 'contact' && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75 backdrop-blur-md animate-in fade-in duration-200">
+        <div
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setActiveModal(null);
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75 backdrop-blur-md animate-in fade-in duration-200"
+        >
           <div className="w-full max-w-xl p-5 sm:p-8 rounded-[28px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto custom-scrollbar">
             {/* Modal Header */}
             <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
@@ -780,7 +1140,7 @@ export default function Footer() {
                     {t('contactSupport')}
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400">
-                    {isRtl ? 'نسعد دائماً باستقبال اقتراحاتكم واستفساراتكم' : 'Direct Support & Developer Inquiries'}
+                    {legalData.contact.subTitle}
                   </p>
                 </div>
               </div>
@@ -801,7 +1161,7 @@ export default function Footer() {
                   {developerEmail}
                 </div>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                  {isRtl ? 'متوسط وقت الرد: أقل من 24-48 ساعة عمل.' : 'Average response turnaround: < 24-48 hours.'}
+                  {legalData.contact.responseSpeed}
                 </p>
               </div>
 
@@ -813,7 +1173,7 @@ export default function Footer() {
                   {copiedEmail ? (
                     <>
                       <Check className="w-4 h-4 text-emerald-500" />
-                      <span>{isRtl ? 'تم النسخ!' : 'Copied!'}</span>
+                      <span>{t('copied')}</span>
                     </>
                   ) : (
                     <>
@@ -841,26 +1201,7 @@ export default function Footer() {
               </h4>
 
               <div className="space-y-2">
-                {[
-                  {
-                    q: isRtl ? 'هل الخدمة مجانية دائماً؟' : 'Is FadeInbox completely free?',
-                    a: isRtl
-                      ? 'نعم، الخدمة الأساسية وتوليد العناوين المؤقتة وحمايتها مجانية بنسبة 100% وبدون أي رسوم خفية.'
-                      : 'Yes, generating temporary email addresses, receiving attachments, and instant self-destruction are 100% free.',
-                  },
-                  {
-                    q: isRtl ? 'هل يمكنني استرجاع بريد بعد انتهاء مدته؟' : 'Can I restore an expired address?',
-                    a: isRtl
-                      ? 'العناوين العادية تتلف ذاتياً مع رسائلها. ولكن إذا قمت بتسجيل الدخول بـ Google وحفظت الرسائل المهمة في الخزنة (Vault)، فستظل محفوظة في حسابك بشكل دائم.'
-                      : 'Standard temporary addresses purge upon timer expiration. However, registered Google accounts can bookmark critical emails to the permanent Cloud Vault.',
-                  },
-                  {
-                    q: isRtl ? 'هل يتم حظر الرسائل المزعجة؟' : 'How does spam protection work?',
-                    a: isRtl
-                      ? 'نعم، بفضل نظام العزل الذاتي، لا يستطيع أي طرف ثالث تعقب عنوان بريدك الحقيقي لأنك تشارك فقط عنوانك المؤقت المعزول.'
-                      : 'All incoming emails are isolated within ephemeral instances, preventing sender trackers and marketing bots from acquiring your real email.',
-                  },
-                ].map((item, idx) => (
+                {legalData.contact.faqs.map((item, idx) => (
                   <div
                     key={idx}
                     className="rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 overflow-hidden"

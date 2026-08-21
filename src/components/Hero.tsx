@@ -91,10 +91,19 @@ export default function Hero({
   const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  // Modal Form State
   const [customUser, setCustomUser] = useState('');
   const [modalDomain, setModalDomain] = useState(selectedDomain || (domains[0]?.domain ?? ''));
   const [modalDuration, setModalDuration] = useState(600); // default 10 minutes (600s)
+
+  // Close modal on Escape key
+  React.useEffect(() => {
+    if (!showCreateModal) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShowCreateModal(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showCreateModal]);
 
   const currentSelectedAccount = activeAccounts.find((a) => a.address === selectedAddress) || activeAccounts[0];
 
@@ -362,7 +371,12 @@ export default function Hero({
 
       {/* Creation & Customization Modal (Requirement 2 & Requirement 4) */}
       {showCreateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-in fade-in duration-200">
+        <div
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setShowCreateModal(false);
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-in fade-in duration-200"
+        >
           <div className="w-full max-w-lg p-6 sm:p-7 rounded-[32px] bg-white dark:bg-[#18181b] border border-slate-200 dark:border-white/10 shadow-2xl space-y-5">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/5 pb-4">
               <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
