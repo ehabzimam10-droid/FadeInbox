@@ -20,6 +20,8 @@ import {
 } from './services/mailApi';
 import { saveEmailToHistory } from './services/storageService';
 
+import { Analytics } from '@vercel/analytics/react';
+
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Inbox from './components/Inbox';
@@ -484,6 +486,9 @@ export default function App() {
       {showAuthModal && (
         <AuthModal onClose={() => setShowAuthModal(false)} />
       )}
+
+      {/* Vercel Web Analytics */}
+      <Analytics />
     </div>
   );
 }
