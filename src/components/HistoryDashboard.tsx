@@ -317,9 +317,7 @@ export default function HistoryDashboard({
         )}
 
         {/* Dashboard Bottom Ad Placement */}
-        <div className="w-full bg-white/40 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 rounded-2xl p-3 backdrop-blur-sm shadow-sm mt-4">
-          <AdSenseUnit format="horizontal" responsive={true} showLabel={true} />
-        </div>
+        <AdSenseUnit format="horizontal" responsive={true} showLabel={true} className="mt-4" />
       </div>
     </section>
   );

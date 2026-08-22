@@ -452,9 +452,7 @@ export default function App() {
               />
 
               {/* Top/Mid Horizontal Ad Unit */}
-              <div className="w-full bg-white/40 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 rounded-2xl p-3 backdrop-blur-sm shadow-sm">
-                <AdSenseUnit format="horizontal" responsive={true} showLabel={true} />
-              </div>
+              <AdSenseUnit format="horizontal" responsive={true} showLabel={true} />
 
               {/* Incoming Inbox Section */}
               <Inbox

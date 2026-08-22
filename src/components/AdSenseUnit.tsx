@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface AdSenseUnitProps {
   slot?: string;
@@ -23,47 +23,92 @@ export default function AdSenseUnit({
   responsive = true,
   className = '',
   style = { display: 'block' },
-  showLabel = false,
+  showLabel = true,
 }: AdSenseUnitProps) {
   const adRef = useRef<HTMLModElement>(null);
   const isPushed = useRef(false);
+  const [isAdFilled, setIsAdFilled] = useState(false);
 
   useEffect(() => {
-    // Only push if script is loaded, container has visible width (>0), and hasn't been pushed yet
-    if (adRef.current && !isPushed.current) {
-      const checkAndPush = () => {
-        if (adRef.current && adRef.current.offsetWidth > 0 && !isPushed.current) {
-          try {
-            if (typeof window !== 'undefined') {
-              (window.adsbygoogle = window.adsbygoogle || []).push({});
-              isPushed.current = true;
-            }
-          } catch (err) {
-            console.debug('AdSense unit initialized:', err);
-          }
-        }
-      };
+    const el = adRef.current;
+    if (!el) return;
 
-      // Check immediately
-      checkAndPush();
+    // Check if AdSense filled the slot
+    const checkFilledStatus = () => {
+      if (!el) return;
+      const status = el.getAttribute('data-ad-status');
+      const hasIframe = el.querySelector('iframe') !== null;
+      const hasPositiveHeight = el.offsetHeight > 20;
 
-      // If width was 0 (e.g. rendered in hidden container or fast tab switch), observe resize
-      if (!isPushed.current && typeof ResizeObserver !== 'undefined' && adRef.current) {
-        const observer = new ResizeObserver(() => {
-          if (adRef.current && adRef.current.offsetWidth > 0 && !isPushed.current) {
-            checkAndPush();
-            observer.disconnect();
-          }
-        });
-        observer.observe(adRef.current);
-        return () => observer.disconnect();
+      if (status === 'filled' || (hasIframe && hasPositiveHeight)) {
+        setIsAdFilled(true);
+      } else if (status === 'unfilled') {
+        setIsAdFilled(false);
       }
+    };
+
+    // Check container width before pushing to prevent zero-width TagError
+    const checkAndPush = () => {
+      if (el && el.offsetWidth > 0 && !isPushed.current) {
+        try {
+          if (typeof window !== 'undefined') {
+            (window.adsbygoogle = window.adsbygoogle || []).push({});
+            isPushed.current = true;
+          }
+        } catch (err) {
+          console.debug('AdSense initialization:', err);
+        }
+      }
+    };
+
+    // Try immediately
+    checkAndPush();
+
+    // If width was 0 initially, observe resize
+    let resizeObserver: ResizeObserver | null = null;
+    if (!isPushed.current && typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(() => {
+        if (el && el.offsetWidth > 0 && !isPushed.current) {
+          checkAndPush();
+          resizeObserver?.disconnect();
+        }
+      });
+      resizeObserver.observe(el);
     }
+
+    // Observe mutation on <ins> element for ad status updates
+    const mutationObserver = new MutationObserver(() => {
+      checkFilledStatus();
+    });
+
+    mutationObserver.observe(el, {
+      attributes: true,
+      attributeFilter: ['data-ad-status', 'style', 'class'],
+      childList: true,
+      subtree: true,
+    });
+
+    // Check periodically for the first few seconds
+    const interval = setInterval(checkFilledStatus, 500);
+    const timeout = setTimeout(() => clearInterval(interval), 6000);
+
+    return () => {
+      resizeObserver?.disconnect();
+      mutationObserver.disconnect();
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
   }, []);
 
   return (
-    <div className={`w-full overflow-hidden flex flex-col justify-center items-center ${className}`}>
-      {showLabel && (
+    <div
+      className={`w-full transition-all duration-300 ${
+        isAdFilled
+          ? `p-3 rounded-2xl bg-white/40 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 backdrop-blur-sm shadow-sm animate-in fade-in duration-300 ${className}`
+          : 'h-0 m-0 p-0 border-0 bg-transparent overflow-hidden opacity-0 pointer-events-none'
+      }`}
+    >
+      {showLabel && isAdFilled && (
         <div className="w-full flex items-center justify-between px-2 pb-1 border-b border-slate-100 dark:border-slate-800/60 mb-2">
           <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
             Advertisement / إعلان
@@ -71,7 +116,7 @@ export default function AdSenseUnit({
           <span className="text-[9px] text-slate-400/80 font-mono">Google Ad</span>
         </div>
       )}
-      <div className="w-full flex justify-center items-center min-h-[60px]">
+      <div className="w-full flex justify-center items-center">
         <ins
           ref={adRef}
           className="adsbygoogle"

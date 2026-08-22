@@ -362,9 +362,7 @@ export default function Hero({
             </SpotlightCard>
 
             {/* Manual Google AdSense Unit (Side Column) */}
-            <div className="p-3 rounded-2xl bg-white/40 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 backdrop-blur-sm shadow-sm">
-              <AdSenseUnit format="auto" responsive={true} showLabel={true} />
-            </div>
+            <AdSenseUnit format="auto" responsive={true} showLabel={true} />
           </div>
         </div>
       </div>
