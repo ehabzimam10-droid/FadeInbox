@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { onAuthStateChanged, signOut, User } from 'firebase/auth';
 import { auth } from './lib/firebase';
 import {
@@ -19,6 +20,7 @@ import {
   generateRandomPassword,
 } from './services/mailApi';
 import { saveEmailToHistory } from './services/storageService';
+import { playNotificationChime, startTitleFlashing, sendDesktopNotification } from './utils/notificationService';
 
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
@@ -64,8 +66,14 @@ export default function App() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isFetchingDetail, setIsFetchingDetail] = useState(false);
 
+  // Translation Hook
+  const { i18n } = useTranslation();
+
   // Modal State
   const [showQrModal, setShowQrModal] = useState(false);
+
+  // Track previous message IDs for live audio/push alerts
+  const prevMessageIdsRef = useRef<Set<string>>(new Set());
 
   // Get currently selected active account object
   const currentAccount = activeAccounts.find((a) => a.address === selectedAddress) || activeAccounts[0] || null;
@@ -346,11 +354,30 @@ export default function App() {
     setIsGenerating(false);
   };
 
-  // Fetch Messages Inbox
+  // Fetch Messages Inbox with Live Sound & Push Alerts
   const fetchInboxMessages = async (token: string, silent = false) => {
     if (!silent) setIsRefreshing(true);
     try {
       const msgList = await getMessages(token);
+
+      // Detect newly arrived messages for live audio & visual alerts
+      const currentIds = new Set(msgList.map((m) => m.id));
+      const newMessages = msgList.filter((m) => !prevMessageIdsRef.current.has(m.id));
+
+      if (newMessages.length > 0 && prevMessageIdsRef.current.size > 0) {
+        // Trigger melodic audio chime
+        playNotificationChime();
+        // Start tab title flashing in browser
+        startTitleFlashing(newMessages.length, i18n.language === 'ar');
+        // Send desktop push notification
+        const latest = newMessages[0];
+        sendDesktopNotification(
+          latest.from?.name || latest.from?.address || 'FadeInbox',
+          latest.subject || 'رسالة جديدة'
+        );
+      }
+
+      prevMessageIdsRef.current = currentIds;
       setMessages(msgList);
     } catch (err: unknown) {
       const error = err as { message?: string };
