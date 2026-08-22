@@ -34,6 +34,7 @@ import { Analytics } from '@vercel/analytics/react';
 
 const LOCAL_ACTIVE_ACCOUNTS_KEY = 'fadeinbox_active_accounts_v2';
 const LOCAL_SELECTED_ADDR_KEY = 'fadeinbox_selected_address_v2';
+const FIRST_VISIT_KEY = 'fadeinbox_first_visit_created_v1';
 
 export default function App() {
   // Theme State
@@ -142,6 +143,8 @@ export default function App() {
             setSelectedAddress(targetAddr);
             const activeAcc = validAccounts.find((a) => a.address === targetAddr) || validAccounts[0];
             fetchInboxMessages(activeAcc.accountToken);
+            // Mark first visit as done so returning users are not treated as first-time visitors
+            localStorage.setItem(FIRST_VISIT_KEY, 'true');
             return;
           }
         } catch (e) {
@@ -149,7 +152,13 @@ export default function App() {
         }
       }
 
-      // If no valid active accounts, leave activeAccounts empty until user creates one
+      // Check if this is literally the user's very first time visiting the site
+      const hasFirstVisited = localStorage.getItem(FIRST_VISIT_KEY);
+      if (!hasFirstVisited) {
+        localStorage.setItem(FIRST_VISIT_KEY, 'true');
+        // Auto-generate a random temporary email with 30-minute lifespan (1800s) on very first visit
+        await createNewAccount(undefined, undefined, 1800);
+      }
     } catch (err) {
       console.error('Mail engine initialization error:', err);
     }
