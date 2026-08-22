@@ -438,7 +438,7 @@ export default function Footer() {
   const currentLangCode = i18n.language || 'en';
   const legalData = LEGAL_DICTIONARY[currentLangCode] || LEGAL_DICTIONARY.en;
   const currentYear = new Date().getFullYear();
-  const developerEmail = 'EHABOOO.FadeInbox@gmail.com';
+  const developerEmail = 'fadeinbox.support@gmail.com';
 
   // Close modals on Escape key
   useEffect(() => {
