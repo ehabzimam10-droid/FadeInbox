@@ -1,0 +1,844 @@
+[
+  {
+    "id": "TC001",
+    "title": "Generate a temporary inbox and see it become active",
+    "description": "This verifies that a guest user can create a disposable inbox and immediately see the generated address and active expiration timer.",
+    "category": "Instant Temporary Email Generator",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the generate new email action"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a temporary email address is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an active expiration timer is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC002",
+    "title": "Create a temporary inbox on the main dashboard",
+    "description": "This verifies that a guest can generate a disposable email address and see an active inbox ready for use.",
+    "category": "Multi-Account Management and Extension Timer",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Create a temporary inbox"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an active email account is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the inbox is ready to receive messages"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC003",
+    "title": "Read a newly received message in the live inbox",
+    "description": "This verifies that an incoming email appears in the live inbox and can be opened for reading.",
+    "category": "Audio and Tab Flash Alerts",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Create a temporary inbox"
+      },
+      {
+        "type": "action",
+        "description": "Wait for a new incoming email to appear"
+      },
+      {
+        "type": "action",
+        "description": "Open the message"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the message content is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the inbox shows the new unread mail state cleared"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC004",
+    "title": "See incoming mail appear in the live inbox",
+    "description": "This verifies that a user can observe new incoming messages appearing in the live inbox for the active temporary address.",
+    "category": "Real-Time Live Inbox and Message Reader",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the generate new email action"
+      },
+      {
+        "type": "action",
+        "description": "Wait for a new message to appear"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify incoming messages are displayed in the inbox"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new message is visible in the message list"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC005",
+    "title": "Open and read a received message",
+    "description": "This verifies that a user can select an incoming email and read its full content in the message reader pane.",
+    "category": "Real-Time Live Inbox and Message Reader",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the generate new email action"
+      },
+      {
+        "type": "action",
+        "description": "Wait for a new message to appear"
+      },
+      {
+        "type": "action",
+        "description": "Open the message"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the message reader pane is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the message content is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC006",
+    "title": "Extract an OTP or verification link from a message",
+    "description": "This verifies that a user can open a message and use the built-in one-click action to copy an OTP or open a verification link.",
+    "category": "Audio and Tab Flash Alerts",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Create a temporary inbox"
+      },
+      {
+        "type": "action",
+        "description": "Wait for a new incoming email to appear"
+      },
+      {
+        "type": "action",
+        "description": "Open the message"
+      },
+      {
+        "type": "action",
+        "description": "Use the OTP or verification link action"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the OTP or verification link action is available"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the message remains open for review"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC007",
+    "title": "Extract and copy an OTP from a message",
+    "description": "This verifies that a user can open a message containing a one-time passcode and copy the detected OTP for use elsewhere.",
+    "category": "Smart OTP and Verification Link Extractor",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the generate new email action"
+      },
+      {
+        "type": "action",
+        "description": "Wait for a message containing an OTP to appear"
+      },
+      {
+        "type": "action",
+        "description": "Copy the detected OTP code"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a copy confirmation is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the OTP is available in the message actions"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC008",
+    "title": "Open a verification link from an email",
+    "description": "This verifies that a user can open a detected verification link directly from a received message.",
+    "category": "Smart OTP and Verification Link Extractor",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the generate new email action"
+      },
+      {
+        "type": "action",
+        "description": "Wait for a message containing a verification link to appear"
+      },
+      {
+        "type": "action",
+        "description": "Open the verification link from the message"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the verification link action is available"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the link is opened for confirmation"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC009",
+    "title": "Create a custom inbox with username, domain, and lifespan",
+    "description": "This verifies that a guest user can create a disposable inbox using custom address settings and see the resulting inbox details.",
+    "category": "Instant Temporary Email Generator",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Enter a custom username"
+      },
+      {
+        "type": "action",
+        "description": "Select a custom domain"
+      },
+      {
+        "type": "action",
+        "description": "Select a lifespan duration"
+      },
+      {
+        "type": "action",
+        "description": "Create the email address"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the custom temporary email address is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the selected lifespan is reflected in the inbox timer"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC010",
+    "title": "Switch between multiple active inboxes",
+    "description": "This verifies that a user can view multiple active email accounts and switch the active inbox without leaving the dashboard.",
+    "category": "Multi-Account Management and Extension Timer",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Create a temporary inbox"
+      },
+      {
+        "type": "action",
+        "description": "Create another temporary inbox"
+      },
+      {
+        "type": "action",
+        "description": "Switch to the other active inbox"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the active inbox changes to a different email account"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify messages for the selected inbox are shown"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC011",
+    "title": "Copy the generated email address",
+    "description": "This verifies that a guest user can copy a newly generated disposable email address for use elsewhere.",
+    "category": "Instant Temporary Email Generator",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the generate new email action"
+      },
+      {
+        "type": "action",
+        "description": "Copy the email address"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a copy confirmation is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the generated email address remains displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC012",
+    "title": "Extend an inbox lifespan by ten minutes",
+    "description": "This verifies that a user can extend an active account and see the expiration timer update accordingly.",
+    "category": "Multi-Account Management and Extension Timer",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Create a temporary inbox"
+      },
+      {
+        "type": "action",
+        "description": "Extend the inbox lifespan by ten minutes"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the expiration timer is updated"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the inbox remains active"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC013",
+    "title": "Switch between rich and raw message views",
+    "description": "This verifies that a user can toggle the same email between formatted HTML and plain-text views and see the content update.",
+    "category": "Real-Time Live Inbox and Message Reader",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the generate new email action"
+      },
+      {
+        "type": "action",
+        "description": "Wait for a new message to appear"
+      },
+      {
+        "type": "action",
+        "description": "Open the message"
+      },
+      {
+        "type": "action",
+        "description": "Switch to the other message view"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the message content is displayed in the selected view"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the alternate view is no longer shown"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC014",
+    "title": "Keep multiple inboxes active and switch between them",
+    "description": "This verifies that a power user can create more than one disposable inbox, switch the active account, and keep each address available.",
+    "category": "Instant Temporary Email Generator",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the generate new email action"
+      },
+      {
+        "type": "action",
+        "description": "Create another email address"
+      },
+      {
+        "type": "action",
+        "description": "Switch to the other active inbox"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the active email address changes"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify multiple active inboxes are available"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC015",
+    "title": "Delete an active inbox",
+    "description": "This verifies that a user can remove an active disposable account from the dashboard.",
+    "category": "Multi-Account Management and Extension Timer",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Create a temporary inbox"
+      },
+      {
+        "type": "action",
+        "description": "Delete the active inbox"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the active inbox is removed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an empty or replacement state is shown"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC016",
+    "title": "Delete a message from the inbox",
+    "description": "This verifies that a user can remove an email from the live inbox and see it disappear from the message list.",
+    "category": "Real-Time Live Inbox and Message Reader",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the generate new email action"
+      },
+      {
+        "type": "action",
+        "description": "Wait for a new message to appear"
+      },
+      {
+        "type": "action",
+        "description": "Delete the message"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the message is removed from the inbox"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the deleted message is no longer available to open"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC017",
+    "title": "Preview an attachment safely in the browser",
+    "description": "This verifies that a user can open an attached file in the secure preview modal and inspect it without leaving the app.",
+    "category": "Safe In-Browser Attachment Sandbox Preview",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Create a temporary inbox"
+      },
+      {
+        "type": "action",
+        "description": "Wait for a message with an attachment to appear"
+      },
+      {
+        "type": "action",
+        "description": "Open the message"
+      },
+      {
+        "type": "action",
+        "description": "Open the safe preview for the attachment"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the attachment preview modal is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the attachment content is visible in the preview"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC018",
+    "title": "Sign in and open the synced vault",
+    "description": "A signed-in user can authenticate and access the permanent vault and history view.",
+    "category": "Google Authentication and Permanent Cloud Vault",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the sign in with Google control"
+      },
+      {
+        "type": "action",
+        "description": "Complete sign in with Google"
+      },
+      {
+        "type": "action",
+        "description": "Open the saved vault and history view"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify saved messages are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify past addresses are displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC019",
+    "title": "Review synced saved messages and addresses",
+    "description": "A signed-in user can open the vault and review both saved messages and past addresses.",
+    "category": "Google Authentication and Permanent Cloud Vault",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the sign in with Google control"
+      },
+      {
+        "type": "action",
+        "description": "Complete sign in with Google"
+      },
+      {
+        "type": "action",
+        "description": "Open the saved vault and history view"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify saved messages are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify past addresses are displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC020",
+    "title": "Sign out of the permanent vault",
+    "description": "A signed-in user can sign out and return to the guest experience.",
+    "category": "Google Authentication and Permanent Cloud Vault",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the sign in with Google control"
+      },
+      {
+        "type": "action",
+        "description": "Complete sign in with Google"
+      },
+      {
+        "type": "action",
+        "description": "Click the sign out control"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the guest experience is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the vault view is no longer displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC021",
+    "title": "Download an attachment from the safe preview",
+    "description": "This verifies that a user can start downloading an attachment after opening the secure preview.",
+    "category": "Safe In-Browser Attachment Sandbox Preview",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Create a temporary inbox"
+      },
+      {
+        "type": "action",
+        "description": "Wait for a message with an attachment to appear"
+      },
+      {
+        "type": "action",
+        "description": "Open the message"
+      },
+      {
+        "type": "action",
+        "description": "Open the safe preview for the attachment"
+      },
+      {
+        "type": "action",
+        "description": "Download the attachment"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the attachment download action is available"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the preview remains accessible after the action"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC022",
+    "title": "Toggle between light and dark appearance",
+    "description": "A guest user can switch the app theme and see the appearance update.",
+    "category": "Internationalization and Theme Customization",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Toggle the theme setting"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the interface switches to the alternate appearance mode"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC023",
+    "title": "Mute and re-enable sound notifications for new mail",
+    "description": "This verifies that the user can turn notification sounds off and back on while staying on the inbox screen.",
+    "category": "Audio and Tab Flash Alerts",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Create a temporary inbox"
+      },
+      {
+        "type": "action",
+        "description": "Mute sound notifications"
+      },
+      {
+        "type": "action",
+        "description": "Wait for a new incoming email to appear"
+      },
+      {
+        "type": "action",
+        "description": "Enable sound notifications"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the sound notification control reflects the enabled state"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify incoming mail still appears in the inbox"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC024",
+    "title": "Switch the interface language",
+    "description": "A guest user can choose a different language and see the interface update accordingly.",
+    "category": "Internationalization and Theme Customization",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Open the language selector"
+      },
+      {
+        "type": "action",
+        "description": "Choose a supported language"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the interface is displayed in the selected language"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC025",
+    "title": "Change language and theme together",
+    "description": "A guest user can update both language and appearance settings without leaving the page.",
+    "category": "Internationalization and Theme Customization",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Open the language selector"
+      },
+      {
+        "type": "action",
+        "description": "Choose a supported language"
+      },
+      {
+        "type": "action",
+        "description": "Toggle the theme setting"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the selected language remains applied"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the alternate appearance mode is active"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC026",
+    "title": "Close a safe attachment preview with Escape",
+    "description": "This verifies that a user can dismiss the attachment sandbox modal using the keyboard.",
+    "category": "Safe In-Browser Attachment Sandbox Preview",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Create a temporary inbox"
+      },
+      {
+        "type": "action",
+        "description": "Wait for a message with an attachment to appear"
+      },
+      {
+        "type": "action",
+        "description": "Open the message"
+      },
+      {
+        "type": "action",
+        "description": "Open the safe preview for the attachment"
+      },
+      {
+        "type": "action",
+        "description": "Press Escape"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the attachment preview modal is dismissed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the underlying message remains open"
+      }
+    ],
+    "priority": "Low"
+  }
+]
