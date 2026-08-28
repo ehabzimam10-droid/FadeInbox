@@ -440,10 +440,32 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
   const developerEmail = 'fadeinbox.support@gmail.com';
 
+  // Handle URL hash deep linking (e.g. #privacy, #terms, #about, #contact) for Googlebot & direct links
+  useEffect(() => {
+    const handleHash = () => {
+      const hash = window.location.hash.toLowerCase().replace('#', '');
+      if (['privacy', 'terms', 'about', 'contact'].includes(hash)) {
+        setActiveModal(hash as ModalType);
+      }
+    };
+    handleHash();
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, []);
+
+  const openModalWithHash = (type: ModalType) => {
+    setActiveModal(type);
+    if (type) {
+      window.history.replaceState(null, '', `#${type}`);
+    } else {
+      window.history.replaceState(null, '', window.location.pathname);
+    }
+  };
+
   // Close modals on Escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setActiveModal(null);
+      if (e.key === 'Escape') openModalWithHash(null);
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
@@ -532,7 +554,7 @@ export default function Footer() {
           <div className="flex flex-wrap items-center justify-between gap-4 text-xs font-medium text-slate-600 dark:text-slate-400">
             <div className="flex flex-wrap items-center gap-2 sm:gap-4">
               <button
-                onClick={() => setActiveModal('privacy')}
+                onClick={() => openModalWithHash('privacy')}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors cursor-pointer"
               >
                 <ShieldCheck className="w-3.5 h-3.5 text-indigo-500" />
@@ -540,7 +562,7 @@ export default function Footer() {
               </button>
 
               <button
-                onClick={() => setActiveModal('terms')}
+                onClick={() => openModalWithHash('terms')}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors cursor-pointer"
               >
                 <FileText className="w-3.5 h-3.5 text-indigo-500" />
@@ -548,7 +570,7 @@ export default function Footer() {
               </button>
 
               <button
-                onClick={() => setActiveModal('about')}
+                onClick={() => openModalWithHash('about')}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors cursor-pointer"
               >
                 <User className="w-3.5 h-3.5 text-indigo-500" />
@@ -556,7 +578,7 @@ export default function Footer() {
               </button>
 
               <button
-                onClick={() => setActiveModal('contact')}
+                onClick={() => openModalWithHash('contact')}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors cursor-pointer"
               >
                 <Mail className="w-3.5 h-3.5 text-indigo-500" />
