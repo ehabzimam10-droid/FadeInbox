@@ -19,7 +19,7 @@ import {
   generateRandomUsername,
   generateRandomPassword,
 } from './services/mailApi';
-import { saveEmailToHistory } from './services/storageService';
+import { saveEmailToHistory, saveMessagePermanently } from './services/storageService';
 import { playNotificationChime, startTitleFlashing, sendDesktopNotification } from './utils/notificationService';
 
 import Navbar from './components/Navbar';
@@ -489,13 +489,11 @@ export default function App() {
                 onSelectMessage={handleSelectMessage}
                 onDeleteMessage={handleDeleteMessage}
                 onSaveMessage={(msg) => {
-                  import('./services/storageService').then((module) => {
-                    module.saveMessagePermanently(
-                      user ? user.uid : null,
-                      selectedAddress || '',
-                      msg
-                    );
-                  });
+                  saveMessagePermanently(
+                    user ? user.uid : null,
+                    selectedAddress || '',
+                    msg
+                  );
                 }}
                 isFetchingDetail={isFetchingDetail}
                 activeEmail={selectedAddress}
