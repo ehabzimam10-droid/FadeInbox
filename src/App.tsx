@@ -32,6 +32,7 @@ import Footer from './components/Footer';
 import AuroraBackground from './components/AuroraBackground';
 import AdSenseUnit from './components/AdSenseUnit';
 import FeaturesGuide from './components/FeaturesGuide';
+import ArticlesSection from './components/ArticlesSection';
 import { Analytics } from '@vercel/analytics/react';
 
 const LOCAL_ACTIVE_ACCOUNTS_KEY = 'fadeinbox_active_accounts_v2';
@@ -502,6 +503,9 @@ export default function App() {
 
               {/* Informative Features Guide & Steps Section for Rich User Experience & AdSense Quality Standards */}
               <FeaturesGuide />
+
+              {/* High-Value Editorial Articles & Knowledge Hub Section for AdSense Compliance */}
+              <ArticlesSection />
             </>
           ) : (
             /* Premium History & Saved Vault Section */
