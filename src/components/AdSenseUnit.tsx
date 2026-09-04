@@ -102,7 +102,10 @@ export default function AdSenseUnit({
 
   return (
     <div
-      className={`w-full transition-all duration-300 ${
+      style={{
+        contain: 'layout style',
+      }}
+      className={`w-full transition-all duration-300 ease-out ${
         isAdFilled
           ? `p-3 rounded-2xl bg-white/40 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 backdrop-blur-sm shadow-sm animate-in fade-in duration-300 ${className}`
           : 'h-0 m-0 p-0 border-0 bg-transparent overflow-hidden opacity-0 pointer-events-none'

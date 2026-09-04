@@ -21,6 +21,7 @@ import {
 } from './services/mailApi';
 import { saveEmailToHistory, saveMessagePermanently } from './services/storageService';
 import { playNotificationChime, startTitleFlashing, sendDesktopNotification } from './utils/notificationService';
+import { extractOtpCode } from './utils/otpExtractor';
 
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
@@ -161,13 +162,10 @@ export default function App() {
         }
       }
 
-      // Check if this is literally the user's very first time visiting the site
-      const hasFirstVisited = localStorage.getItem(FIRST_VISIT_KEY);
-      if (!hasFirstVisited) {
-        localStorage.setItem(FIRST_VISIT_KEY, 'true');
-        // Auto-generate a random temporary email with 30-minute lifespan (1800s) on very first visit
-        await createNewAccount(undefined, undefined, 1800);
-      }
+      // If no valid active accounts exist (first visit OR previous accounts expired):
+      // Automatically generate a random 30-minute temporary email (Zero-click experience)
+      localStorage.setItem(FIRST_VISIT_KEY, 'true');
+      await createNewAccount(undefined, undefined, 1800);
     } catch (err) {
       console.error('Mail engine initialization error:', err);
     }
@@ -370,11 +368,13 @@ export default function App() {
         playNotificationChime();
         // Start tab title flashing in browser
         startTitleFlashing(newMessages.length, i18n.language === 'ar');
-        // Send desktop push notification
+        // Send desktop push notification with smart OTP preview
         const latest = newMessages[0];
+        const extractedOtp = extractOtpCode(latest.subject || '', latest.intro || '');
         sendDesktopNotification(
           latest.from?.name || latest.from?.address || 'FadeInbox',
-          latest.subject || 'رسالة جديدة'
+          latest.subject || 'رسالة جديدة',
+          extractedOtp
         );
       }
 

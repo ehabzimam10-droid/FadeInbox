@@ -122,34 +122,65 @@ export function stopTitleFlashing(): void {
 }
 
 /**
- * Send Web Desktop Notification if permitted
+ * Check if Web Notification API is supported in current browser
+ */
+export function isNotificationSupported(): boolean {
+  return typeof window !== 'undefined' && 'Notification' in window;
+}
+
+/**
+ * Get current browser notification permission
+ */
+export function getNotificationPermission(): NotificationPermission {
+  if (!isNotificationSupported()) return 'denied';
+  return Notification.permission;
+}
+
+/**
+ * Request browser notification permission explicitly
+ */
+export async function requestNotificationPermission(): Promise<NotificationPermission> {
+  if (!isNotificationSupported()) return 'denied';
+  try {
+    return await Notification.requestPermission();
+  } catch (err) {
+    console.error('Failed to request notification permission:', err);
+    return 'denied';
+  }
+}
+
+/**
+ * Send Web Desktop Notification with smart OTP preview if permitted
  */
 export async function sendDesktopNotification(
   senderName: string,
-  subject: string
+  subject: string,
+  otpCode?: string | null
 ): Promise<void> {
-  if (typeof window === 'undefined' || !('Notification' in window)) return;
+  if (!isNotificationSupported() || Notification.permission !== 'granted') return;
 
-  if (Notification.permission === 'granted') {
-    try {
-      new Notification(`FadeInbox: ${senderName}`, {
-        body: subject || 'وصلت رسالة جديدة إلى بريدك المؤقت',
-        icon: '/favicon.png',
-      });
-    } catch {
-      // Ignore in unsupported environments
-    }
-  } else if (Notification.permission !== 'denied') {
-    try {
-      const perm = await Notification.requestPermission();
-      if (perm === 'granted') {
-        new Notification(`FadeInbox: ${senderName}`, {
-          body: subject || 'وصلت رسالة جديدة إلى بريدك المؤقت',
-          icon: '/favicon.png',
-        });
-      }
-    } catch {
-      // Ignore
-    }
+  try {
+    const title = otpCode
+      ? `FadeInbox: 🔑 رمز التحقق ${otpCode}`
+      : `FadeInbox: ✉️ رسالة من ${senderName}`;
+
+    const body = otpCode
+      ? `رمز التأكيد: ${otpCode}\nالموضوع: ${subject || 'رسالة تفعيل جديدة'}`
+      : (subject || 'وصلت رسالة جديدة إلى بريدك المؤقت');
+
+    const notification = new Notification(title, {
+      body,
+      icon: '/favicon.png',
+      badge: '/favicon.png',
+      tag: otpCode ? `fadeinbox-otp-${otpCode}` : `fadeinbox-msg-${Date.now()}`,
+      requireInteraction: !!otpCode, // Keeps OTP notification visible until dismissed
+    });
+
+    notification.onclick = () => {
+      window.focus();
+      notification.close();
+    };
+  } catch (err) {
+    console.debug('Desktop notification error:', err);
   }
 }

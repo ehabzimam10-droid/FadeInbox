@@ -18,6 +18,9 @@ import {
   Copy,
   Volume2,
   VolumeX,
+  Bell,
+  BellRing,
+  BellOff,
 } from 'lucide-react';
 import SpotlightCard from './SpotlightCard';
 import MagneticButton from './MagneticButton';
@@ -25,7 +28,14 @@ import AdSenseUnit from './AdSenseUnit';
 import AttachmentPreviewModal, { PreviewAttachmentData } from './AttachmentPreviewModal';
 import { MailMessageSummary, MailMessageDetail } from '../types';
 import { extractOtpCode, extractSmartActions } from '../utils/otpExtractor';
-import { isSoundEnabled, setSoundEnabled, playNotificationChime } from '../utils/notificationService';
+import {
+  isSoundEnabled,
+  setSoundEnabled,
+  playNotificationChime,
+  isNotificationSupported,
+  getNotificationPermission,
+  requestNotificationPermission,
+} from '../utils/notificationService';
 
 interface InboxProps {
   messages: MailMessageSummary[];
@@ -54,6 +64,7 @@ export default function Inbox({
   const [copiedReaderOtp, setCopiedReaderOtp] = useState(false);
   const [soundOn, setSoundOn] = useState(true);
   const [previewAttachment, setPreviewAttachment] = useState<PreviewAttachmentData | null>(null);
+  const [pushPerm, setPushPerm] = useState<NotificationPermission>(() => getNotificationPermission());
 
   // Sync initial sound setting
   useEffect(() => {
@@ -67,6 +78,12 @@ export default function Inbox({
     if (nextState) {
       playNotificationChime();
     }
+  };
+
+  const handleTogglePush = async () => {
+    if (pushPerm === 'granted') return;
+    const result = await requestNotificationPermission();
+    setPushPerm(result);
   };
 
   const handleSave = (msg: MailMessageDetail) => {
@@ -107,19 +124,57 @@ export default function Inbox({
             </span>
           </div>
 
-          {/* Sound & Notification Toggle */}
-          <button
-            onClick={handleToggleSound}
-            title={soundOn ? (isRtl ? 'كتم التنبيهات الصوتية' : 'Mute Sound') : (isRtl ? 'تشغيل التنبيهات الصوتية' : 'Enable Sound')}
-            className={`px-3 py-1.5 rounded-2xl border transition-all cursor-pointer flex items-center gap-1.5 text-xs font-bold ${
-              soundOn
-                ? 'bg-purple-50 dark:bg-[#8b5cf6]/10 text-purple-600 dark:text-[#a78bfa] border-purple-200 dark:border-[#8b5cf6]/30 shadow-sm'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-400 border-slate-200 dark:border-slate-700'
-            }`}
-          >
-            {soundOn ? <Volume2 className="w-4 h-4 text-purple-600 dark:text-[#8b5cf6]" /> : <VolumeX className="w-4 h-4" />}
-            <span className="hidden sm:inline">{soundOn ? (isRtl ? 'صوت التنبيهات مفعّل' : 'Sound On') : (isRtl ? 'مكتوم' : 'Muted')}</span>
-          </button>
+          {/* Action Controls: Push Notifications & Sound */}
+          <div className="flex items-center gap-2">
+            {isNotificationSupported() && (
+              <button
+                onClick={handleTogglePush}
+                title={
+                  pushPerm === 'granted'
+                    ? (isRtl ? 'إشعارات المتصفح مفعّلة (تصلك رموز الـ OTP فوراً)' : 'Browser Push Notifications Active')
+                    : pushPerm === 'denied'
+                    ? (isRtl ? 'الإشعارات محظورة في إعدادات المتصفح' : 'Notifications Blocked in Browser Settings')
+                    : (isRtl ? 'تفعيل إشعارات المتصفح (تلقي الأكواد عند تصغير المتصفح)' : 'Enable Browser Push Notifications')
+                }
+                className={`px-3 py-1.5 rounded-2xl border transition-all cursor-pointer flex items-center gap-1.5 text-xs font-bold ${
+                  pushPerm === 'granted'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 shadow-sm'
+                    : pushPerm === 'denied'
+                    ? 'bg-rose-50 dark:bg-rose-950/30 text-rose-500 dark:text-rose-400 border-rose-200 dark:border-rose-800/40'
+                    : 'bg-purple-50 hover:bg-purple-100 dark:bg-[#8b5cf6]/15 hover:dark:bg-[#8b5cf6]/25 text-purple-700 dark:text-[#a78bfa] border-purple-200 dark:border-[#8b5cf6]/30 shadow-sm animate-pulse'
+                }`}
+              >
+                {pushPerm === 'granted' ? (
+                  <BellRing className="w-4 h-4 text-emerald-500" />
+                ) : pushPerm === 'denied' ? (
+                  <BellOff className="w-4 h-4 text-rose-500" />
+                ) : (
+                  <Bell className="w-4 h-4 text-purple-600 dark:text-[#8b5cf6]" />
+                )}
+                <span className="hidden sm:inline">
+                  {pushPerm === 'granted'
+                    ? (isRtl ? 'الإشعارات نشطة' : 'Push Active')
+                    : pushPerm === 'denied'
+                    ? (isRtl ? 'محظورة' : 'Blocked')
+                    : (isRtl ? 'تفعيل إشعارات المتصفح' : 'Enable Push')}
+                </span>
+              </button>
+            )}
+
+            {/* Sound Toggle */}
+            <button
+              onClick={handleToggleSound}
+              title={soundOn ? (isRtl ? 'كتم التنبيهات الصوتية' : 'Mute Sound') : (isRtl ? 'تشغيل التنبيهات الصوتية' : 'Enable Sound')}
+              className={`px-3 py-1.5 rounded-2xl border transition-all cursor-pointer flex items-center gap-1.5 text-xs font-bold ${
+                soundOn
+                  ? 'bg-purple-50 dark:bg-[#8b5cf6]/10 text-purple-600 dark:text-[#a78bfa] border-purple-200 dark:border-[#8b5cf6]/30 shadow-sm'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-400 border-slate-200 dark:border-slate-700'
+              }`}
+            >
+              {soundOn ? <Volume2 className="w-4 h-4 text-purple-600 dark:text-[#8b5cf6]" /> : <VolumeX className="w-4 h-4" />}
+              <span className="hidden sm:inline">{soundOn ? (isRtl ? 'صوت التنبيهات مفعّل' : 'Sound On') : (isRtl ? 'مكتوم' : 'Muted')}</span>
+            </button>
+          </div>
         </div>
 
         {/* Split View Bento Container */}
