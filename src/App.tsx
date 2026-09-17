@@ -479,9 +479,6 @@ export default function App() {
                 onManualRefresh={() => currentAccount && fetchInboxMessages(currentAccount.accountToken)}
               />
 
-              {/* Top/Mid Horizontal Ad Unit */}
-              <AdSenseUnit format="horizontal" responsive={true} showLabel={true} />
-
               {/* Incoming Inbox Section */}
               <Inbox
                 messages={messages}
@@ -502,8 +499,14 @@ export default function App() {
               {/* Informative Features Guide & Steps Section for Rich User Experience & AdSense Quality Standards */}
               <FeaturesGuide />
 
+              {/* Policy-Compliant Editorial In-Content Ad Unit (Surrounded by Educational Publisher Content) */}
+              <AdSenseUnit format="horizontal" responsive={true} showLabel={true} />
+
               {/* High-Value Editorial Articles & Knowledge Hub Section for AdSense Compliance */}
               <ArticlesSection />
+
+              {/* Bottom Contextual Ad Unit */}
+              <AdSenseUnit format="horizontal" responsive={true} showLabel={true} />
             </>
           ) : (
             /* Premium History & Saved Vault Section */
